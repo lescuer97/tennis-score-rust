@@ -1,6 +1,6 @@
 
 
- fn compare_deuce(game:  Game) -> Game {
+ fn compare_deuce(game: &mut Game) -> Game {
     match game {
         // verifies if there is a deuce
         game if game.player1 == 40 && game.player2 == 40 && game.stage == Stage::Normal => return Game {
@@ -35,18 +35,18 @@ impl  Game {
 // TODO CHECK IF THERE IS A DEUCE CHECK WHEN IT'S WON
 // TODO IF THERE IS TIE BREAK CHECK IF THERE IS ADVANTAGE OF TWO POINT AND 7 OR OVER
 
-// FIXME change the way that points get added
- match self.player1 {
-        0 => return Self{ player1: self.player1 += 15, player2: self.player2, stage: stage: Stage::Normal},
-        15 => return Self{ player1: self.player1 += 15, player2: self.player2, stage: stage: Stage::Normal},
-        30 => return Self{ player1: self.player1 += 10, player2: self.player2, stage: stage: Stage::Normal},
-        40 if self.player2 < 40 => return Self{ player1: 0, player2: 0, stage: stage: Stage::Normal},
-        _ => Self{ player1: self.player1, player2: self.player2, stage: stage: Stage::Normal}
-    }
+// FIXME change the way that points get added so it returns correct values
+//  match self.player1 {
+//         40 if self.player2 < 40 => return Self{ player1: 0, player2: 0, stage: stage: Stage::Normal},
+//         0 => return Self{ player1: self.player1 += 15, player2: self.player2, stage: stage: Stage::Normal},
+//         15 => return Self{ player1: self.player1 += 15, player2: self.player2, stage: stage: Stage::Normal},
+//         30 => return Self{ player1: self.player1 += 10, player2: self.player2, stage: stage: Stage::Normal},
+//         _ => Self{ player1: self.player1, player2: self.player2, stage: stage: Stage::Normal}
+//     }
 
   
     
-    let game = compare_deuce(Self{});
+    let game = compare_deuce(self);
 
     return game;
     }
