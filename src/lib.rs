@@ -58,16 +58,22 @@ pub enum Stage {
     TieBreak,
 }
 
+#[derive(PartialEq, Debug,Clone, Copy)]
+pub enum Player {
+    Home,
+    Oponent,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     #[test]
     fn initialize(){
      
-        assert_eq!(Game::new(), Game {
-            player1: 0,
-            player2: 0,
+        assert_eq!(FullGame::new(), FullGame {
+            game: ((Player::Home, 0) ,(Player::Oponent, 0)),
             stage: Stage::Normal,
+            set: [(0,0);3]
         })
     }
     #[test]
