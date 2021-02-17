@@ -1,16 +1,20 @@
 
 
- fn compare_deuce(game: &mut Game) -> Game {
-    match game {
-        // verifies if there is a deuce
-        game if game.player1 == 40 && game.player2 == 40 && game.stage == Stage::Normal => return Game {
-            player1: 0,
-            player2: 0,
-            stage: Stage::Deuce,
-        },
-        _ => return Game {player1: game.player1,player2: game.player2,stage: game.stage}
+    fn check_deuce(check: FullGame) -> FullGame {
+     let  checked=   if check.game.0.1 == 40 && check.game.1.1 == 40 {
+                 FullGame {
+                    game: ((check.game.0.0, 0),(check.game.1.0, 0)),
+                    stage: Stage::Deuce,
+                    set: check.set
+                }
+            } else {
+                 FullGame {
+                    game: check.game,
+                    stage: check.stage,
+                    set: check.set
+            } };
+            return checked;
     }
-}
 
 //  TODO ADD GAMES FOR SET
 #[derive(PartialEq, Debug)]
@@ -47,7 +51,22 @@ impl  FullGame {
         _ => (self.game.0, self.game.1),
     };
 
-    return game;
+ let checker = if play.0.1 == 41 && self.stage == Stage::Normal {
+                         game_win(self, 0)
+                    } else if play.1.1 == 41 {
+                         game_win(self, 1)
+                    } else {
+                         FullGame {
+                            game: play,
+                            stage: self.stage,
+                            set: self.set
+                        }
+                    };
+    let deuce = check_deuce(checker);
+    return deuce
+    // let mut game = check_deuce(self);
+    // game = check_win(&mut game);
+    // return game;
     }
 }
 
