@@ -72,16 +72,60 @@ mod tests {
     }
     #[test]
     fn add_point_test() {
-        let mut game = Game  {
-            player1: 0,
-            player2: 0,
+        let mut game = FullGame  {
+            game: ((Player::Home, 30) ,(Player::Oponent, 30)),
             stage: Stage::Normal,
+            set: [(0,0);3]
         };
 
-        assert_eq!( game.add_point_player_1(), Game  {
-            player1: 15,
-            player2: 0,
+        assert_eq!( game.add_point(Player::Oponent), FullGame  {
+            game: ((Player::Home, 30) ,(Player::Oponent, 40)),
             stage: Stage::Normal,
+            set: [(0,0);3]
+        });
+    }
+
+    #[test]
+    fn check_deuce() {
+        let mut game = FullGame  {
+            game: ((Player::Home, 30) ,(Player::Oponent, 40)),
+            stage: Stage::Normal,
+            set: [(0,0);3]
+        };
+
+        assert_eq!( game.add_point(Player::Home), FullGame  {
+            game: ((Player::Home, 0) ,(Player::Oponent, 0)),
+            stage: Stage::Deuce,
+            set: [(0,0);3]
+        });
+    }
+    #[test]
+    fn check_game_win() {
+        let mut game = FullGame  {
+            game: ((Player::Home, 30) ,(Player::Oponent, 40)),
+            stage: Stage::Normal,
+            set: [(0,0);3]
+        };
+
+        assert_eq!( game.add_point(Player::Oponent), FullGame  {
+            game: ((Player::Home, 0) ,(Player::Oponent, 0)),
+            stage: Stage::Normal,
+            set: [(0,1), (0,0),(0,0)]
+        });
+    }
+
+    #[test]
+    fn check_second_set_win() {
+        let mut game = FullGame  {
+            game: ((Player::Home, 30) ,(Player::Oponent, 40)),
+            stage: Stage::Normal,
+            set: [(7,5), (0,0),(0,0)]
+        };
+
+        assert_eq!( game.add_point(Player::Oponent), FullGame  {
+            game: ((Player::Home, 0) ,(Player::Oponent, 0)),
+            stage: Stage::Normal,
+            set: [(7,5), (0,1),(0,0)]
         });
     }
 
