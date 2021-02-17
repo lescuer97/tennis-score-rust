@@ -1,4 +1,10 @@
 
+    // TODO CHECK IF THERE IS A DEUCE CHECK WHEN IT'S WON
+    // TODO IF THERE IS TIE BREAK CHECK IF THERE IS ADVANTAGE OF TWO POINT AND 7 OR OVER
+
+
+#![feature(array_methods)]
+#![feature(array_map)]
 
     fn check_deuce(check: FullGame) -> FullGame {
      let  checked=   if check.game.0.1 == 40 && check.game.1.1 == 40 {
@@ -16,7 +22,46 @@
             return checked;
     }
 
-//  TODO ADD GAMES FOR SET
+    fn game_win(check: &mut FullGame, point: u8 ) -> FullGame {
+        // round is for counting the completed sets
+        let mut round:i8 = 0;
+        let mut action: i8 = 0;
+        let adder = |round:i8| {  round + 1};
+        // checks if the last set is done and moves to the next 
+        let  point_added: [(u8,u8);3] = check.set.map(| a: (u8,u8) | // FIXME FIRST SET REGISTER FAILING
+                                                                    // if a.0 >= 6 || a.1 >= 6  {
+                                                                    //     round = adder(round);
+                                                                    //     a 
+                                                                    // }else if point == 0 {
+                                                                    //     // checks if other sets have been looped and actions have taken place
+                                                                    //     if round ==  action && action >= 0 { 
+                                                                    //          a 
+                                                                    //     } else {
+                                                                    //         action = adder(action);
+                                                                    //         (a.0 + 1, a.1)
+                                                                    //     }                                                                      
+                                                                     
+                                                                    // } else if point == 1 {
+                                                                    //     if round ==  action && action >= 0 { 
+                                                                    //          a 
+                                                                    //     } else {
+                                                                    //         action = adder(action);
+                                                                    //         (a.0,a.1 + 1)
+                                                                    //     }                                                                    
+                                                                    // }else { a }
+                                                                
+                                                                
+                                                                
+                                                                );
+
+        return FullGame {
+            game: ((check.game.0.0,0),(check.game.1.0,0)),
+            stage: Stage::Normal,
+            set: point_added
+        }
+    }
+
+
 #[derive(PartialEq, Debug)]
 pub struct FullGame  {
     pub game: ((Player,u8) ,(Player, u8)),
