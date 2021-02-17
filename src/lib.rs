@@ -14,39 +14,38 @@
 
 //  TODO ADD GAMES FOR SET
 #[derive(PartialEq, Debug)]
-pub struct Game  {
-   pub player1: u8,
-    pub player2: u8,
-    pub stage: Stage
+pub struct FullGame  {
+    pub game: ((Player,u8) ,(Player, u8)),
+    pub stage: Stage,
+    pub set: [(u8,u8);3],
 }
 
-impl  Game {
+impl  FullGame {
     // creates a new game
   pub  fn new() -> Self  {
-        Game {
-            player1: 0,
-            player2: 0,
+        FullGame {
+            game: ((Player::Home, 0) ,(Player::Oponent, 0)),
             stage: Stage::Normal,
+            set: [(0,0);3]
         }
     }
 
-    pub fn add_point_player_1(&mut self ) -> Self {
-// TODO ADD THE CORRECT AMOUNT OF POINTS
-// TODO CHECK IF THERE IS A DEUCE CHECK WHEN IT'S WON
-// TODO IF THERE IS TIE BREAK CHECK IF THERE IS ADVANTAGE OF TWO POINT AND 7 OR OVER
-
-// FIXME change the way that points get added so it returns correct values
-//  match self.player1 {
-//         40 if self.player2 < 40 => return Self{ player1: 0, player2: 0, stage: stage: Stage::Normal},
-//         0 => return Self{ player1: self.player1 += 15, player2: self.player2, stage: stage: Stage::Normal},
-//         15 => return Self{ player1: self.player1 += 15, player2: self.player2, stage: stage: Stage::Normal},
-//         30 => return Self{ player1: self.player1 += 10, player2: self.player2, stage: stage: Stage::Normal},
-//         _ => Self{ player1: self.player1, player2: self.player2, stage: stage: Stage::Normal}
-//     }
-
-  
-    
-    let game = compare_deuce(self);
+    pub fn add_point(&mut self, point: Player ) -> Self {
+        // this is for matching normal game points
+    let play = match self.game {
+        // check for point for HOME
+        (x,op ) if x.0 == point && x.1 < 30 => ((x.0, x.1 + 15),(op)),
+        (x,op ) if x.0 == point && x.1 == 30 => ((x.0, x.1 + 10),(op)),
+        // If it gives 41 its a game win and it will be processed later
+        (x,op ) if x.0 == point && x.1 == 40 && op.1 <=30 => ((x.0, x.1 + 1),(op)),
+       
+        // check for point for Oponent
+        (x,op ) if op.0 == point && op.1 < 30 => ((x),(op.0, op.1 + 15)),
+        (x,op ) if op.0 == point && op.1 == 30 => ((x),(op.0, op.1 + 10)),
+         // If it gives 41 its a game win and it will be processed later
+        (x,op ) if op.0 == point && op.1 == 40 && x.1 <= 30 => ((x),(op.0, op.1 + 1)),
+        _ => (self.game.0, self.game.1),
+    };
 
     return game;
     }
