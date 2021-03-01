@@ -21,39 +21,45 @@ fn check_deuce(check: FullGame) -> FullGame {
     return checked;
 }
 
+// adds the game win in the correct place
 fn game_win(check: &mut FullGame, point: u8) -> FullGame {
- // round is for counting the completed sets
- let mut round:i8 = 0;
- let mut action: i8 = 0;
- let adder = |round:i8| {  round + 1};
- // checks if the last set is done and moves to the next 
- let  point_added: [(u8,u8);3] = check.set.map(| a: (u8,u8) | // FIXME FIRST SET REGISTER FAILING
-                                                             // if a.0 >= 6 || a.1 >= 6  {
-                                                             //     round = adder(round);
-                                                             //     a 
-                                                             // }else if point == 0 {
-                                                             //     // checks if other sets have been looped and actions have taken place
-                                                             //     if round ==  action && action >= 0 { 
-                                                             //          a 
-                                                             //     } else {
-                                                             //         action = adder(action);
-                                                             //         (a.0 + 1, a.1)
-                                                             //     }                                                                      
-                                                              
-                                                             // } else if point == 1 {
-                                                             //     if round ==  action && action >= 0 { 
-                                                             //          a 
-                                                             //     } else {
-                                                             //         action = adder(action);
-                                                             //         (a.0,a.1 + 1)
-                                                             //     }                                                                    
-                                                             // }else { a }
-                                                         );
+    // round is for counting the completed sets
+    let mut passed_set: i8 = 0;
+
+    // checks for action of adding point
+    let mut action_taken: i8 = 0;
+
+    // adds to the counter
+    let adder = |a: i8| a + 1;
+
+    // checks if the last set is done and moves to the next
+    let point_added: [(u8, u8); 3] = check.set.map(|a: (u8, u8)| {
+        // TODO REFATOR INTO OWN FUNCTION
+        // checks if a set has already been won
+        if a.0 >= 6 || a.1 >= 6 {
+            passed_set = adder(passed_set);
+            a
+        // checks if the action of adding a point its been executed and return without doing anything
+        } else if passed_set == action_taken && action_taken != 0 {
+            a
+            // checks if no action has been taken and the other cases has already been covered
+        } else if action_taken == 0 {
+            let result = match point {
+                0 => (a.0 + 1, a.1),
+                1 => (a.0, a.1 + 1),
+                _ => a,
+            };
+            action_taken = adder(action_taken);
+            result
+        } else {
+            a
+        }
+    });
 
     return FullGame {
         game: ((check.game.0 .0, 0), (check.game.1 .0, 0)),
         stage: Stage::Normal,
-        set: check.set,
+        set: point_added,
     };
 }
 
