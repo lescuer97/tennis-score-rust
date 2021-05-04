@@ -96,7 +96,7 @@ impl FullGame {
             (hm, op) if op.0 == point && op.1 == 40 && hm.1 <= 30 => ((hm), (op.0, op.1 + 1)),
             _ => (self.game.0, self.game.1),
         };
-        // checks gamewhin for first player
+        // checks game win for first player
         let checker = if play.0 .1 == 41 && self.stage == Stage::Normal {
             game_win(self, 0)
             // checks gamewin for second player
@@ -160,6 +160,35 @@ mod tests {
                 set: [(0, 0); 3]
             }
         );
+        assert_eq!(
+            game.add_point(Player::Home),
+            FullGame {
+                game: ((Player::Home, 40), (Player::Oponent, 30)),
+                stage: Stage::Normal,
+                set: [(0, 0); 3]
+            }
+        );
+        let mut game2 = FullGame {
+            game: ((Player::Home, 0), (Player::Oponent, 0)),
+            stage: Stage::Normal,
+            set: [(0, 0); 3],
+        };
+        assert_eq!(
+            game2.add_point(Player::Home),
+            FullGame {
+                game: ((Player::Home, 15), (Player::Oponent, 0)),
+                stage: Stage::Normal,
+                set: [(0, 0); 3]
+            }
+        );
+        assert_eq!(
+            game2.add_point(Player::Oponent),
+            FullGame {
+                game: ((Player::Home, 0), (Player::Oponent, 15)),
+                stage: Stage::Normal,
+                set: [(0, 0); 3]
+            }
+        );
     }
 
     #[test]
@@ -172,6 +201,20 @@ mod tests {
 
         assert_eq!(
             game.add_point(Player::Home),
+            FullGame {
+                game: ((Player::Home, 0), (Player::Oponent, 0)),
+                stage: Stage::Deuce,
+                set: [(0, 0); 3]
+            }
+        );
+        let mut game2 = FullGame {
+            game: ((Player::Home, 40), (Player::Oponent, 30)),
+            stage: Stage::Normal,
+            set: [(0, 0); 3],
+        };
+
+        assert_eq!(
+            game2.add_point(Player::Oponent),
             FullGame {
                 game: ((Player::Home, 0), (Player::Oponent, 0)),
                 stage: Stage::Deuce,
@@ -211,6 +254,20 @@ mod tests {
                 game: ((Player::Home, 0), (Player::Oponent, 0)),
                 stage: Stage::Normal,
                 set: [(7, 5), (0, 1), (0, 0)]
+            }
+        );
+        let mut game2 = FullGame {
+            game: ((Player::Home, 40), (Player::Oponent, 30)),
+            stage: Stage::Normal,
+            set: [(7, 5), (0, 0), (0, 0)],
+        };
+
+        assert_eq!(
+            game2.add_point(Player::Home),
+            FullGame {
+                game: ((Player::Home, 0), (Player::Oponent, 0)),
+                stage: Stage::Normal,
+                set: [(7, 5), (1, 0), (0, 0)]
             }
         );
     }
