@@ -5,6 +5,7 @@
 #![feature(array_map)]
 
 fn check_deuce(check: FullGame) -> FullGame {
+    // checks that both player have 40 points and set to Deuce
     let checked = if check.game.0 .1 == 40 && check.game.1 .1 == 40 {
         FullGame {
             game: ((check.game.0 .0, 0), (check.game.1 .0, 0)),
@@ -84,16 +85,26 @@ impl FullGame {
         // this is for matching normal game points
         let play = match self.game {
             // check for point for HOME
-            (hm, op) if hm.0 == point && hm.1 < 30 => ((hm.0, hm.1 + 15), (op)),
-            (hm, op) if hm.0 == point && hm.1 == 30 => ((hm.0, hm.1 + 10), (op)),
+            (home, oponent) if home.0 == point && home.1 < 30 => ((home.0, home.1 + 15), (oponent)),
+            (home, oponent) if home.0 == point && home.1 == 30 => {
+                ((home.0, home.1 + 10), (oponent))
+            }
             // If it gives 41 its a game win and it will be processed later
-            (hm, op) if hm.0 == point && hm.1 == 40 && op.1 <= 30 => ((hm.0, hm.1 + 1), (op)),
+            (home, oponent) if home.0 == point && home.1 == 40 && oponent.1 <= 30 => {
+                ((home.0, home.1 + 1), (oponent))
+            }
 
             // check for point for Oponent
-            (hm, op) if op.0 == point && op.1 < 30 => ((hm), (op.0, op.1 + 15)),
-            (hm, op) if op.0 == point && op.1 == 30 => ((hm), (op.0, op.1 + 10)),
+            (home, oponent) if oponent.0 == point && oponent.1 < 30 => {
+                ((home), (oponent.0, oponent.1 + 15))
+            }
+            (home, oponent) if oponent.0 == point && oponent.1 == 30 => {
+                ((home), (oponent.0, oponent.1 + 10))
+            }
             // If it gives 41 its a game win and it will be processed later
-            (hm, op) if op.0 == point && op.1 == 40 && hm.1 <= 30 => ((hm), (op.0, op.1 + 1)),
+            (home, oponent) if oponent.0 == point && oponent.1 == 40 && home.1 <= 30 => {
+                ((home), (oponent.0, oponent.1 + 1))
+            }
             _ => (self.game.0, self.game.1),
         };
         // checks game win for first player
