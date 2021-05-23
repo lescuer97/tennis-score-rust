@@ -90,8 +90,11 @@ pub enum Player {
 
 #[derive(PartialEq, Debug)]
 pub struct FullGame {
+    // First Tupple is Home
     pub game: [(Player, i8); 2],
     pub stage: Stage,
+    // first is the home player and second the oponent
+    // the bool is to check if the set is finished
     pub set: [(u8, u8, bool); 3],
 }
 
@@ -104,7 +107,7 @@ impl FullGame {
             set: [(0, 0, false); 3],
         }
     }
-
+    // checks the stage of the game
     pub fn add_point(self, point: Player) -> Self {
         let play = match self.stage {
             Stage::Normal => normal_game(&self, point),
