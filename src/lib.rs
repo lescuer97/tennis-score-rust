@@ -16,24 +16,111 @@ fn normal_game(players: &FullGame, who_scored: Player) -> FullGame {
             [(home.0, home.1 + 1), (oponent)]
         }
 
-        // check for who_scored for Oponent
-        [home, oponent] if oponent.0 == who_scored && oponent.1 < 30 => {
-            [(home), (oponent.0, oponent.1 + 15)]
-        }
-        [home, oponent] if oponent.0 == who_scored && oponent.1 == 30 => {
-            [(home), (oponent.0, oponent.1 + 10)]
-        }
-        // If it gives 41 its a game win and it will be processed later
-        [home, oponent] if oponent.0 == who_scored && oponent.1 == 40 && home.1 <= 30 => {
-            [(home), (oponent.0, oponent.1 + 1)]
-        }
-        _ => [players.game[0], players.game[1]],
+fn tie_break_point(whole_game: FullGame, who_scored: Player) -> FullGame {
+    let play = match who_scored {
+        // HOME
+        Player::Home => [
+            (whole_game.score[0].0, whole_game.score[0].1 + 1),
+            whole_game.score[1],
+        ],
+
+        // OPPONENT
+        Player::Oponent => [
+            whole_game.score[0],
+            (whole_game.score[1].0, whole_game.score[1].1 + 1),
+        ],
+    };
+    let updated_game = FullGame {
+        score: play,
+        stage: whole_game.stage,
+        set: whole_game.set,
     };
 
+    let difference = updated_game.score[0].1 - updated_game.score[1].1;
+    // HOME Wins Game, if gets to six and difference is bigger than 2 point
+    if difference == 2 && updated_game.score[0].1 >= 6 {
+        return game_win(updated_game, Player::Home);
+        }
+
+    // Oposition wins game, if gets to six and difference is bigger than 2 point
+    if difference == -2 && updated_game.score[1].1 >= 6 {
+        return game_win(updated_game, Player::Oponent);
+        }
+    return updated_game;
+        }
+
+fn normal_point(whole_game: &FullGame, who_scored: Player) -> FullGame {
+    let play = match who_scored {
+        // HOME
+        Player::Home if whole_game.score[0].1 == 0 => [
+            (whole_game.score[0].0, whole_game.score[0].1 + 15),
+            whole_game.score[1],
+        ],
+        Player::Home if whole_game.score[0].1 == 15 => [
+            (whole_game.score[0].0, whole_game.score[0].1 + 15),
+            whole_game.score[1],
+        ],
+        Player::Home if whole_game.score[0].1 == 30 => [
+            (whole_game.score[0].0, whole_game.score[0].1 + 10),
+            whole_game.score[1],
+        ],
+        Player::Home if whole_game.score[0].1 == 40 => [
+            (whole_game.score[0].0, whole_game.score[0].1 + 1),
+            whole_game.score[1],
+        ],
+        // OPPONENT
+        Player::Oponent if whole_game.score[1].1 == 0 => [
+            whole_game.score[0],
+            (whole_game.score[1].0, whole_game.score[1].1 + 15),
+        ],
+        Player::Oponent if whole_game.score[1].1 == 15 => [
+            whole_game.score[0],
+            (whole_game.score[1].0, whole_game.score[1].1 + 15),
+        ],
+        Player::Oponent if whole_game.score[1].1 == 30 => [
+            whole_game.score[0],
+            (whole_game.score[1].0, whole_game.score[1].1 + 10),
+        ],
+        Player::Oponent if whole_game.score[1].1 == 40 => [
+            whole_game.score[0],
+            (whole_game.score[1].0, whole_game.score[1].1 + 1),
+        ],
+        _ => [whole_game.score[0], whole_game.score[1]],
+    };
+
+    if play[0].1 == 40 && play[1].1 == 40 {
     return FullGame {
-        game: play,
-        stage: players.stage,
-        set: players.set,
+            score: [(Player::Home, 0), (Player::Oponent, 0)],
+            stage: Stage::Deuce,
+            set: whole_game.set,
+        };
+    }
+
+    if play[0].1 == 41 {
+        return game_win(
+            FullGame {
+                score: play,
+                stage: whole_game.stage,
+                set: whole_game.set,
+            },
+            Player::Home,
+        );
+    }
+    if play[1].1 == 41 {
+        return game_win(
+            FullGame {
+                score: play,
+                stage: whole_game.stage,
+                set: whole_game.set,
+            },
+            Player::Oponent,
+        );
+    }
+
+    return FullGame {
+        score: play,
+        stage: whole_game.stage,
+        set: whole_game.set,
     };
 }
 
