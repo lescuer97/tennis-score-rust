@@ -110,10 +110,9 @@ impl FullGame {
     // checks the stage of the game
     pub fn add_point(self, point: Player) -> Self {
         let play = match self.stage {
-            Stage::Normal => normal_game(&self, point),
-            Stage::Deuce => deuce_game(self, point),
-            _ => self,
-            // Stage::TieBreak => tie_break(),
+            Stage::Normal => normal_point(&self, point),
+            Stage::Deuce => deuce_point(self, point),
+            Stage::TieBreak => tie_break_point(self, point),
         };
 
         return play;
