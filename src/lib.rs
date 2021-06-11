@@ -1,5 +1,3 @@
-// TODO MAKE GAME WIN FUNCTION
-// TODO MAKE TIE BREAK FUNCTION
 #![feature(array_methods)]
 #![feature(array_map)]
 
@@ -13,7 +11,7 @@ fn game_win(whole_game: FullGame, who_scored: Player) -> FullGame {
                 return (game.0 + 1, game.1, game.2);
             } else {
                 game
-        }
+            }
         }),
         Player::Oponent => whole_game.set.map(|game: (i8, i8, bool)| {
             if !game.2 && !done {
@@ -21,7 +19,7 @@ fn game_win(whole_game: FullGame, who_scored: Player) -> FullGame {
                 return (game.0, game.1 + 1, game.2);
             } else {
                 return game;
-        }
+            }
         }),
     };
 
@@ -41,7 +39,7 @@ fn game_win(whole_game: FullGame, who_scored: Player) -> FullGame {
         stage: Stage::Normal,
         set: score,
     };
-        }
+}
 
 fn tie_break_point(whole_game: FullGame, who_scored: Player) -> FullGame {
     let play = match who_scored {
@@ -67,14 +65,14 @@ fn tie_break_point(whole_game: FullGame, who_scored: Player) -> FullGame {
     // HOME Wins Game, if gets to six and difference is bigger than 2 point
     if difference == 2 && updated_game.score[0].1 >= 6 {
         return game_win(updated_game, Player::Home);
-        }
+    }
 
     // Oposition wins game, if gets to six and difference is bigger than 2 point
     if difference == -2 && updated_game.score[1].1 >= 6 {
         return game_win(updated_game, Player::Oponent);
-        }
+    }
     return updated_game;
-        }
+}
 
 fn normal_point(whole_game: &FullGame, who_scored: Player) -> FullGame {
     let play = match who_scored {
@@ -116,7 +114,7 @@ fn normal_point(whole_game: &FullGame, who_scored: Player) -> FullGame {
     };
 
     if play[0].1 == 40 && play[1].1 == 40 {
-    return FullGame {
+        return FullGame {
             score: [(Player::Home, 0), (Player::Oponent, 0)],
             stage: Stage::Deuce,
             set: whole_game.set,
@@ -211,18 +209,18 @@ pub enum Player {
 #[derive(PartialEq, Debug)]
 pub struct FullGame {
     // First Tupple is Home
-    pub game: [(Player, i8); 2],
+    pub score: [(Player, i8); 2],
     pub stage: Stage,
     // first is the home player and second the oponent
     // the bool is to check if the set is finished
-    pub set: [(u8, u8, bool); 3],
+    pub set: [(i8, i8, bool); 3],
 }
 
 impl FullGame {
     // creates a new game
     pub fn new() -> Self {
         FullGame {
-            game: [(Player::Home, 0), (Player::Oponent, 0)],
+            score: [(Player::Home, 0), (Player::Oponent, 0)],
             stage: Stage::Normal,
             set: [(0, 0, false); 3],
         }
@@ -242,13 +240,12 @@ impl FullGame {
 #[cfg(test)]
 mod tests {
     use super::*;
-    // use pretty_assertions::assert_eq;
     #[test]
     fn initialize() {
         assert_eq!(
             FullGame::new(),
             FullGame {
-                game: [(Player::Home, 0), (Player::Oponent, 0)],
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
                 stage: Stage::Normal,
                 set: [(0, 0, false); 3]
             }
@@ -257,32 +254,127 @@ mod tests {
     #[test]
     fn add_point_test() {
         let game = FullGame {
-            game: [(Player::Home, 0), (Player::Oponent, 0)],
+            score: [(Player::Home, 0), (Player::Oponent, 0)],
             stage: Stage::Normal,
             set: [(0, 0, false); 3],
         };
         assert_eq!(
             game.add_point(Player::Home).add_point(Player::Oponent),
             FullGame {
-                game: [(Player::Home, 15), (Player::Oponent, 15)],
+                score: [(Player::Home, 15), (Player::Oponent, 15)],
                 stage: Stage::Normal,
                 set: [(0, 0, false); 3],
             }
         );
     }
     #[test]
-    fn check_deuce() {
+    fn make_deuce() {
         let game = FullGame {
-            game: [(Player::Home, 1), (Player::Oponent, 0)],
+            score: [(Player::Home, 30), (Player::Oponent, 40)],
+            stage: Stage::Normal,
+            set: [(0, 0, false); 3],
+        };
+        assert_eq!(
+            game.add_point(Player::Home),
+            FullGame {
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
+                stage: Stage::Deuce,
+                set: [(0, 0, false); 3],
+            }
+        );
+    }
+    #[test]
+    fn solve_deuce() {
+        let game = FullGame {
+            score: [(Player::Home, 1), (Player::Oponent, 0)],
             stage: Stage::Deuce,
             set: [(0, 0, false); 3],
         };
         assert_eq!(
             game.add_point(Player::Home),
             FullGame {
-                game: [(Player::Home, 0), (Player::Oponent, 0)],
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
                 stage: Stage::Normal,
                 set: [(1, 0, false); 3],
+            }
+        );
+    }
+    #[test]
+    fn first_game_win() {
+        let game = FullGame {
+            score: [(Player::Home, 40), (Player::Oponent, 30)],
+            stage: Stage::Normal,
+            set: [(0, 0, false); 3],
+        };
+        assert_eq!(
+            game.add_point(Player::Home),
+            FullGame {
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
+                stage: Stage::Normal,
+                set: [(1, 0, false), (0, 0, false), (0, 0, false)],
+            }
+        );
+        let game2 = FullGame {
+            score: [(Player::Home, 30), (Player::Oponent, 40)],
+            stage: Stage::Normal,
+            set: [(0, 0, false); 3],
+        };
+        assert_eq!(
+            game2.add_point(Player::Oponent),
+            FullGame {
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
+                stage: Stage::Normal,
+                set: [(0, 1, false), (0, 0, false), (0, 0, false)],
+            }
+        );
+    }
+    #[test]
+    fn check_first_game_turns_true() {
+        let game = FullGame {
+            score: [(Player::Home, 40), (Player::Oponent, 30)],
+            stage: Stage::Normal,
+            set: [(5, 4, false), (0, 0, false), (0, 0, false)],
+        };
+        assert_eq!(
+            game.add_point(Player::Home),
+            FullGame {
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
+                stage: Stage::Normal,
+                set: [(6, 4, true), (0, 0, false), (0, 0, false)],
+            }
+        );
+    }
+
+    #[test]
+    fn second_game_win() {
+        let game = FullGame {
+            score: [(Player::Home, 40), (Player::Oponent, 30)],
+            stage: Stage::Normal,
+            set: [(6, 4, true), (0, 0, false), (0, 0, false)],
+        };
+        assert_eq!(
+            game.add_point(Player::Home),
+            FullGame {
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
+                stage: Stage::Normal,
+                set: [(6, 4, true), (1, 0, false), (0, 0, false)],
+            }
+        );
+    }
+
+    #[test]
+    fn check_second_game_win_true() {
+        let game = FullGame {
+            score: [(Player::Home, 40), (Player::Oponent, 30)],
+            stage: Stage::Normal,
+            set: [(6, 4, true), (5, 4, false), (0, 0, false)],
+        };
+        assert_eq!(
+            game.add_point(Player::Home),
+            FullGame {
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
+                stage: Stage::Normal,
+                set: [(6, 4, true), (6, 4, true), (0, 0, false)],
             }
         );
     }
