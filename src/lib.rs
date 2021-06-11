@@ -2,18 +2,45 @@
 // TODO MAKE TIE BREAK FUNCTION
 #![feature(array_methods)]
 #![feature(array_map)]
-fn normal_game(players: &FullGame, who_scored: Player) -> FullGame {
-    let play = match players.game {
-        // check for who_scored for HOME
-        [home, oponent] if home.0 == who_scored && home.1 < 30 => {
-            [(home.0, home.1 + 15), (oponent)]
+
+fn game_win(whole_game: FullGame, who_scored: Player) -> FullGame {
+    let mut done: bool = false;
+
+    let mut score: [(i8, i8, bool); 3] = match who_scored {
+        Player::Home => whole_game.set.map(|game: (i8, i8, bool)| {
+            if !game.2 && !done {
+                done = true;
+                return (game.0 + 1, game.1, game.2);
+            } else {
+                game
         }
-        [home, oponent] if home.0 == who_scored && home.1 == 30 => {
-            [(home.0, home.1 + 10), (oponent)]
+        }),
+        Player::Oponent => whole_game.set.map(|game: (i8, i8, bool)| {
+            if !game.2 && !done {
+                done = true;
+                return (game.0, game.1 + 1, game.2);
+            } else {
+                return game;
         }
-        // If it gives 41 its a game win and it will be processed later
-        [home, oponent] if home.0 == who_scored && home.1 == 40 && oponent.1 <= 30 => {
-            [(home.0, home.1 + 1), (oponent)]
+        }),
+    };
+
+    score = score.map(|game: (i8, i8, bool)| {
+        let difference: i8 = game.0 - game.1;
+        if difference == 2 && game.1 >= 4 && !game.2 {
+            return (game.0, game.1, true);
+        }
+        if difference == -2 && game.0 >= 4 && !game.2 {
+            return (game.0, game.1, true);
+        }
+        return game;
+    });
+    println!("{:?}", score);
+    return FullGame {
+        score: [(Player::Home, 0), (Player::Oponent, 0)],
+        stage: Stage::Normal,
+        set: score,
+    };
         }
 
 fn tie_break_point(whole_game: FullGame, who_scored: Player) -> FullGame {
