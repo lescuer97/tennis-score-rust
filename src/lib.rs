@@ -37,41 +37,47 @@ fn normal_game(players: &FullGame, who_scored: Player) -> FullGame {
     };
 }
 
-fn deuce_game(mut players: FullGame, who_scored: Player) -> FullGame {
+fn deuce_point(mut whole_game: FullGame, who_scored: Player) -> FullGame {
     // adds point to the correct player
-    players = match who_scored {
+    whole_game = match who_scored {
         Player::Home => FullGame {
-            game: [(Player::Home, players.game[0].1 + 1), players.game[1]],
-            stage: players.stage,
-            set: players.set,
+            score: [
+                (Player::Home, whole_game.score[0].1 + 1),
+                whole_game.score[1],
+            ],
+            stage: whole_game.stage,
+            set: whole_game.set,
         },
         Player::Oponent => FullGame {
-            game: [players.game[0], (Player::Oponent, players.game[1].1 + 1)],
-            stage: players.stage,
-            set: players.set,
+            score: [
+                whole_game.score[0],
+                (Player::Oponent, whole_game.score[1].1 + 1),
+            ],
+            stage: whole_game.stage,
+            set: whole_game.set,
         },
     };
 
     // Difference in point in between PLayer Home and Player Oponent
-    let difference = players.game[0].1 - players.game[1].1;
-    println!("Differrence: {}", difference);
-    // if the difference in beetween point is enough it goes to game add
+    let difference = whole_game.score[0].1 - whole_game.score[1].1;
+
+    // if the difference in beetween point is 2 it goes to game add
     if difference >= 2 || difference <= -2 {
-        if players.game[0].1 > players.game[1].1 {
+        if whole_game.score[0].1 > whole_game.score[1].1 {
             return FullGame {
-                game: [(Player::Home, 0), (Player::Oponent, 0)],
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
                 stage: Stage::Normal,
                 set: [(1, 0, false); 3],
             };
         } else {
             return FullGame {
-                game: [(Player::Home, 0), (Player::Oponent, 0)],
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
                 stage: Stage::Normal,
                 set: [(0, 1, false); 3],
             };
         }
     } else {
-        return players;
+        return whole_game;
     }
 }
 
