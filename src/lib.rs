@@ -1,37 +1,50 @@
-#![feature(array_methods)]
 #![feature(array_map)]
 
 fn game_win(whole_game: FullGame, who_scored: Player) -> FullGame {
     let mut done: bool = false;
 
+    // check for sets that are finished and only writes on the first one that is not finished
     let mut score: [(i8, i8, bool); 3] = match who_scored {
-        Player::Home => whole_game.set.map(|game: (i8, i8, bool)| {
-            if !game.2 && !done {
+        Player::Home => whole_game.sets.map(|set: (i8, i8, bool)| {
+            if !set.2 && !done {
                 done = true;
-                return (game.0 + 1, game.1, game.2);
+                return (set.0 + 1, set.1, set.2);
             } else {
-                game
+                set
             }
         }),
-        Player::Oponent => whole_game.set.map(|game: (i8, i8, bool)| {
-            if !game.2 && !done {
+        Player::Oponent => whole_game.sets.map(|set: (i8, i8, bool)| {
+            if !set.2 && !done {
                 done = true;
-                return (game.0, game.1 + 1, game.2);
+                return (set.0, set.1 + 1, set.2);
             } else {
-                return game;
+                return set;
             }
         }),
     };
 
-    score = score.map(|game: (i8, i8, bool)| {
-        let difference: i8 = game.0 - game.1;
-        if difference == 2 && game.1 >= 4 && !game.2 {
-            return (game.0, game.1, true);
+    // THIS CHECKS IF SET WAS WON
+    score = score.map(|set: (i8, i8, bool)| {
+        let difference: i8 = set.0 - set.1;
+        // FOR Home SET WIN
+        // this check tiebreak win
+        if difference == 1 && set.1 == 6 && !set.2 && whole_game.stage == Stage::TieBreak {
+            return (set.0, set.1, true);
         }
-        if difference == -2 && game.0 >= 4 && !game.2 {
-            return (game.0, game.1, true);
+        // checks normal set win
+        if difference == 2 && set.1 >= 4 && !set.2 {
+            return (set.0, set.1, true);
         }
-        return game;
+        // FOR OPPOSITION SET WIN
+        // this check tiebreak win
+        if difference == -1 && set.0 == 6 && !set.2 && whole_game.stage == Stage::TieBreak {
+            return (set.0, set.1, true);
+        }
+        // checks normal set win
+        if difference == -2 && set.0 >= 4 && !set.2 {
+            return (set.0, set.1, true);
+        }
+        return set;
     });
 
     let mut activate_tie_break: bool = false;
@@ -57,7 +70,7 @@ fn game_win(whole_game: FullGame, who_scored: Player) -> FullGame {
     return FullGame {
         score: [(Player::Home, 0), (Player::Oponent, 0)],
         stage: Stage::Normal,
-        set: score,
+        sets: score,
     };
 }
 
@@ -78,7 +91,7 @@ fn tie_break_point(whole_game: FullGame, who_scored: Player) -> FullGame {
     let updated_game = FullGame {
         score: play,
         stage: whole_game.stage,
-        set: whole_game.set,
+        sets: whole_game.sets,
     };
 
     let difference = updated_game.score[0].1 - updated_game.score[1].1;
@@ -137,7 +150,7 @@ fn normal_point(whole_game: &FullGame, who_scored: Player) -> FullGame {
         return FullGame {
             score: [(Player::Home, 0), (Player::Oponent, 0)],
             stage: Stage::Deuce,
-            set: whole_game.set,
+            sets: whole_game.sets,
         };
     }
 
@@ -146,7 +159,7 @@ fn normal_point(whole_game: &FullGame, who_scored: Player) -> FullGame {
             FullGame {
                 score: play,
                 stage: whole_game.stage,
-                set: whole_game.set,
+                sets: whole_game.sets,
             },
             Player::Home,
         );
@@ -156,7 +169,7 @@ fn normal_point(whole_game: &FullGame, who_scored: Player) -> FullGame {
             FullGame {
                 score: play,
                 stage: whole_game.stage,
-                set: whole_game.set,
+                sets: whole_game.sets,
             },
             Player::Oponent,
         );
@@ -165,20 +178,20 @@ fn normal_point(whole_game: &FullGame, who_scored: Player) -> FullGame {
     return FullGame {
         score: play,
         stage: whole_game.stage,
-        set: whole_game.set,
+        sets: whole_game.sets,
     };
 }
 
-fn deuce_point(mut whole_game: FullGame, who_scored: Player) -> FullGame {
+fn deuce_point(whole_game: FullGame, who_scored: Player) -> FullGame {
     // adds point to the correct player
-    whole_game = match who_scored {
+    let updated_game = match who_scored {
         Player::Home => FullGame {
             score: [
                 (Player::Home, whole_game.score[0].1 + 1),
                 whole_game.score[1],
             ],
             stage: whole_game.stage,
-            set: whole_game.set,
+            sets: whole_game.sets,
         },
         Player::Oponent => FullGame {
             score: [
@@ -186,31 +199,22 @@ fn deuce_point(mut whole_game: FullGame, who_scored: Player) -> FullGame {
                 (Player::Oponent, whole_game.score[1].1 + 1),
             ],
             stage: whole_game.stage,
-            set: whole_game.set,
+            sets: whole_game.sets,
         },
     };
 
     // Difference in point in between PLayer Home and Player Oponent
-    let difference = whole_game.score[0].1 - whole_game.score[1].1;
+    let difference = updated_game.score[0].1 - updated_game.score[1].1;
 
     // if the difference in beetween point is 2 it goes to game add
-    if difference >= 2 || difference <= -2 {
-        if whole_game.score[0].1 > whole_game.score[1].1 {
-            return FullGame {
-                score: [(Player::Home, 0), (Player::Oponent, 0)],
-                stage: Stage::Normal,
-                set: [(1, 0, false); 3],
-            };
-        } else {
-            return FullGame {
-                score: [(Player::Home, 0), (Player::Oponent, 0)],
-                stage: Stage::Normal,
-                set: [(0, 1, false); 3],
-            };
-        }
-    } else {
-        return whole_game;
+    if difference >= 2 {
+        return game_win(updated_game, Player::Home);
     }
+    if difference <= -2 {
+        return game_win(updated_game, Player::Oponent);
+    }
+
+    return updated_game;
 }
 
 #[derive(PartialEq, Debug, Clone, Copy)]
@@ -233,7 +237,7 @@ pub struct FullGame {
     pub stage: Stage,
     // first is the home player and second the oponent
     // the bool is to check if the set is finished
-    pub set: [(i8, i8, bool); 3],
+    pub sets: [(i8, i8, bool); 3],
 }
 
 impl FullGame {
@@ -242,7 +246,7 @@ impl FullGame {
         FullGame {
             score: [(Player::Home, 0), (Player::Oponent, 0)],
             stage: Stage::Normal,
-            set: [(0, 0, false); 3],
+            sets: [(0, 0, false); 3],
         }
     }
     // checks the stage of the game
@@ -267,7 +271,7 @@ mod tests {
             FullGame {
                 score: [(Player::Home, 0), (Player::Oponent, 0)],
                 stage: Stage::Normal,
-                set: [(0, 0, false); 3]
+                sets: [(0, 0, false); 3]
             }
         )
     }
@@ -276,14 +280,14 @@ mod tests {
         let game = FullGame {
             score: [(Player::Home, 0), (Player::Oponent, 0)],
             stage: Stage::Normal,
-            set: [(0, 0, false); 3],
+            sets: [(0, 0, false); 3],
         };
         assert_eq!(
             game.add_point(Player::Home).add_point(Player::Oponent),
             FullGame {
                 score: [(Player::Home, 15), (Player::Oponent, 15)],
                 stage: Stage::Normal,
-                set: [(0, 0, false); 3],
+                sets: [(0, 0, false); 3],
             }
         );
     }
@@ -292,14 +296,14 @@ mod tests {
         let game = FullGame {
             score: [(Player::Home, 30), (Player::Oponent, 40)],
             stage: Stage::Normal,
-            set: [(0, 0, false); 3],
+            sets: [(0, 0, false); 3],
         };
         assert_eq!(
             game.add_point(Player::Home),
             FullGame {
                 score: [(Player::Home, 0), (Player::Oponent, 0)],
                 stage: Stage::Deuce,
-                set: [(0, 0, false); 3],
+                sets: [(0, 0, false); 3],
             }
         );
     }
@@ -308,14 +312,14 @@ mod tests {
         let game = FullGame {
             score: [(Player::Home, 1), (Player::Oponent, 0)],
             stage: Stage::Deuce,
-            set: [(0, 0, false); 3],
+            sets: [(0, 0, false); 3],
         };
         assert_eq!(
             game.add_point(Player::Home),
             FullGame {
                 score: [(Player::Home, 0), (Player::Oponent, 0)],
                 stage: Stage::Normal,
-                set: [(1, 0, false); 3],
+                sets: [(1, 0, false), (0, 0, false), (0, 0, false)],
             }
         );
     }
@@ -324,27 +328,27 @@ mod tests {
         let game = FullGame {
             score: [(Player::Home, 40), (Player::Oponent, 30)],
             stage: Stage::Normal,
-            set: [(0, 0, false); 3],
+            sets: [(0, 0, false); 3],
         };
         assert_eq!(
             game.add_point(Player::Home),
             FullGame {
                 score: [(Player::Home, 0), (Player::Oponent, 0)],
                 stage: Stage::Normal,
-                set: [(1, 0, false), (0, 0, false), (0, 0, false)],
+                sets: [(1, 0, false), (0, 0, false), (0, 0, false)],
             }
         );
         let game2 = FullGame {
             score: [(Player::Home, 30), (Player::Oponent, 40)],
             stage: Stage::Normal,
-            set: [(0, 0, false); 3],
+            sets: [(0, 0, false); 3],
         };
         assert_eq!(
             game2.add_point(Player::Oponent),
             FullGame {
                 score: [(Player::Home, 0), (Player::Oponent, 0)],
                 stage: Stage::Normal,
-                set: [(0, 1, false), (0, 0, false), (0, 0, false)],
+                sets: [(0, 1, false), (0, 0, false), (0, 0, false)],
             }
         );
     }
@@ -353,14 +357,14 @@ mod tests {
         let game = FullGame {
             score: [(Player::Home, 40), (Player::Oponent, 30)],
             stage: Stage::Normal,
-            set: [(5, 4, false), (0, 0, false), (0, 0, false)],
+            sets: [(5, 4, false), (0, 0, false), (0, 0, false)],
         };
         assert_eq!(
             game.add_point(Player::Home),
             FullGame {
                 score: [(Player::Home, 0), (Player::Oponent, 0)],
                 stage: Stage::Normal,
-                set: [(6, 4, true), (0, 0, false), (0, 0, false)],
+                sets: [(6, 4, true), (0, 0, false), (0, 0, false)],
             }
         );
     }
@@ -370,14 +374,14 @@ mod tests {
         let game = FullGame {
             score: [(Player::Home, 40), (Player::Oponent, 30)],
             stage: Stage::Normal,
-            set: [(6, 4, true), (0, 0, false), (0, 0, false)],
+            sets: [(6, 4, true), (0, 0, false), (0, 0, false)],
         };
         assert_eq!(
             game.add_point(Player::Home),
             FullGame {
                 score: [(Player::Home, 0), (Player::Oponent, 0)],
                 stage: Stage::Normal,
-                set: [(6, 4, true), (1, 0, false), (0, 0, false)],
+                sets: [(6, 4, true), (1, 0, false), (0, 0, false)],
             }
         );
     }
@@ -387,14 +391,93 @@ mod tests {
         let game = FullGame {
             score: [(Player::Home, 40), (Player::Oponent, 30)],
             stage: Stage::Normal,
-            set: [(6, 4, true), (5, 4, false), (0, 0, false)],
+            sets: [(6, 4, true), (5, 4, false), (0, 0, false)],
         };
         assert_eq!(
             game.add_point(Player::Home),
             FullGame {
                 score: [(Player::Home, 0), (Player::Oponent, 0)],
                 stage: Stage::Normal,
-                set: [(6, 4, true), (6, 4, true), (0, 0, false)],
+                sets: [(6, 4, true), (6, 4, true), (0, 0, false)],
+            }
+        );
+    }
+    #[test]
+    fn check_deuce_and_then_tie_break() {
+        let game = FullGame {
+            score: [(Player::Home, 30), (Player::Oponent, 30)],
+            stage: Stage::Normal,
+            sets: [(6, 5, false), (0, 0, false), (0, 0, false)],
+        };
+        assert_eq!(
+            game.add_point(Player::Home)
+                .add_point(Player::Oponent)
+                .add_point(Player::Oponent)
+                .add_point(Player::Oponent),
+            FullGame {
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
+                stage: Stage::TieBreak,
+                sets: [(6, 6, false), (0, 0, false), (0, 0, false)],
+            }
+        );
+    }
+    #[test]
+    fn solve_tie_break() {
+        let game = FullGame {
+            score: [(Player::Home, 6), (Player::Oponent, 5)],
+            stage: Stage::TieBreak,
+            sets: [(6, 6, false), (0, 0, false), (0, 0, false)],
+        };
+        assert_eq!(
+            game.add_point(Player::Home),
+            FullGame {
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
+                stage: Stage::Normal,
+                sets: [(7, 6, true), (0, 0, false), (0, 0, false)],
+            }
+        );
+        let game2 = FullGame {
+            score: [(Player::Home, 6), (Player::Oponent, 5)],
+            stage: Stage::TieBreak,
+            sets: [(6, 6, false), (0, 0, false), (0, 0, false)],
+        };
+        assert_eq!(
+            game2
+                .add_point(Player::Oponent)
+                .add_point(Player::Oponent)
+                .add_point(Player::Oponent)
+                .add_point(Player::Oponent),
+            FullGame {
+                score: [(Player::Home, 0), (Player::Oponent, 15)],
+                stage: Stage::Normal,
+                sets: [(6, 7, true), (0, 0, false), (0, 0, false)],
+            }
+        );
+    }
+
+    #[test]
+    fn third_game_start_and_oponent_wins_first_deuce() {
+        let game = FullGame {
+            score: [(Player::Home, 40), (Player::Oponent, 0)],
+            stage: Stage::Normal,
+            sets: [(7, 6, true), (6, 5, false), (0, 0, false)],
+        };
+        assert_eq!(
+            game.add_point(Player::Home)
+                .add_point(Player::Home)
+                .add_point(Player::Oponent)
+                .add_point(Player::Home)
+                .add_point(Player::Oponent)
+                .add_point(Player::Home)
+                .add_point(Player::Oponent)
+                .add_point(Player::Home)
+                .add_point(Player::Oponent)
+                .add_point(Player::Oponent)
+                .add_point(Player::Oponent),
+            FullGame {
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
+                stage: Stage::Normal,
+                sets: [(7, 6, true), (7, 5, true), (0, 1, false)],
             }
         );
     }
