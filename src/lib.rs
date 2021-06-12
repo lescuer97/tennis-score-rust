@@ -33,7 +33,27 @@ fn game_win(whole_game: FullGame, who_scored: Player) -> FullGame {
         }
         return game;
     });
-    println!("{:?}", score);
+
+    let mut activate_tie_break: bool = false;
+
+    // THIS CHECKS IF there is a tieBreak and sets the tie_break up if 6 -6 and not already set
+    score = score.map(|set: (i8, i8, bool)| {
+        if set.0 == 6 && set.1 == 6 && whole_game.stage != Stage::TieBreak {
+            activate_tie_break = true;
+            return (set.0, set.1, set.2);
+        } else {
+            return set;
+        }
+    });
+
+    if activate_tie_break {
+        return FullGame {
+            score: [(Player::Home, 0), (Player::Oponent, 0)],
+            stage: Stage::TieBreak,
+            sets: score,
+        };
+    }
+
     return FullGame {
         score: [(Player::Home, 0), (Player::Oponent, 0)],
         stage: Stage::Normal,
