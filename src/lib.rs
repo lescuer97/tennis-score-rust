@@ -107,7 +107,7 @@ fn tie_break_point(whole_game: FullGame, who_scored: Player) -> FullGame {
     return updated_game;
 }
 
-fn normal_point(whole_game: &FullGame, who_scored: Player) -> FullGame {
+fn normal_point(whole_game: FullGame, who_scored: Player) -> FullGame {
     let play = match who_scored {
         // HOME
         Player::Home if whole_game.score[0].1 == 0 => [
@@ -252,7 +252,7 @@ impl FullGame {
     // checks the stage of the game
     pub fn add_point(self, point: Player) -> Self {
         let play = match self.stage {
-            Stage::Normal => normal_point(&self, point),
+            Stage::Normal => normal_point(self, point),
             Stage::Deuce => deuce_point(self, point),
             Stage::TieBreak => tie_break_point(self, point),
         };
