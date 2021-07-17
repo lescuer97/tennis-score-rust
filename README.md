@@ -9,8 +9,8 @@ you can use the default test and build cargo commands
 
 ## Stages
 
-1. \~\~Simple one set Game\~\~
-2. \~\~Complete game with 3 sets\~\~
+1. ~~Simple one set Game~~
+2. ~~Complete game with 3 sets~~
 3. Make Application play instead of library
 4. Display Scores
 5. Transfer app to embedded
