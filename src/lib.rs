@@ -1,10 +1,17 @@
 #![feature(array_map)]
+//! # tennis-score
+//!
+//! `tennis-score` is a little "in development" app that lets you play tennis and in the future
+//! be able to be put in a micro controller so you can carry it to play games.
 
+/// adds game point if the game was won
 fn game_win(whole_game: FullGame, who_scored: Player) -> FullGame {
     let mut done: bool = false;
 
     // check for sets that are finished and only writes on the first one that is not finished
     let mut score: [(i8, i8, bool); 3] = match who_scored {
+        // loops inside the array of sets
+        // checks that the game is not already done and the point is not added
         Player::Home => whole_game.sets.map(|set: (i8, i8, bool)| {
             if !set.2 && !done {
                 done = true;
@@ -13,6 +20,8 @@ fn game_win(whole_game: FullGame, who_scored: Player) -> FullGame {
                 set
             }
         }),
+        // loops inside the array of sets
+        // checks that the game is not already done and the point is not added
         Player::Oponent => whole_game.sets.map(|set: (i8, i8, bool)| {
             if !set.2 && !done {
                 done = true;
@@ -27,7 +36,7 @@ fn game_win(whole_game: FullGame, who_scored: Player) -> FullGame {
     score = score.map(|set: (i8, i8, bool)| {
         let difference: i8 = set.0 - set.1;
         // FOR Home SET WIN
-        // this check tiebreak win
+        // this checks tiebreak win
         if difference == 1 && set.1 == 6 && !set.2 && whole_game.stage == Stage::TieBreak {
             return (set.0, set.1, true);
         }
@@ -49,11 +58,11 @@ fn game_win(whole_game: FullGame, who_scored: Player) -> FullGame {
 
     let mut activate_tie_break: bool = false;
 
-    // THIS CHECKS IF there is a tieBreak and sets the tie_break up if 6 -6 and not already set
+    // THIS CHECKS IF there is a tieBreak and sets the tie_break up if 6 - 6 and not already on tiebreak
     score = score.map(|set: (i8, i8, bool)| {
         if set.0 == 6 && set.1 == 6 && whole_game.stage != Stage::TieBreak {
             activate_tie_break = true;
-            return (set.0, set.1, set.2);
+            return set;
         } else {
             return set;
         }
@@ -74,6 +83,7 @@ fn game_win(whole_game: FullGame, who_scored: Player) -> FullGame {
     };
 }
 
+/// Adds point in the tie break
 fn tie_break_point(whole_game: FullGame, who_scored: Player) -> FullGame {
     let play = match who_scored {
         // HOME
@@ -107,9 +117,10 @@ fn tie_break_point(whole_game: FullGame, who_scored: Player) -> FullGame {
     return updated_game;
 }
 
+/// Adds point a Normal Stage Game, depending on the score.
 fn normal_point(whole_game: FullGame, who_scored: Player) -> FullGame {
     let play = match who_scored {
-        // HOME
+        // HOME SCORE POINTS
         Player::Home if whole_game.score[0].1 == 0 => [
             (whole_game.score[0].0, whole_game.score[0].1 + 15),
             whole_game.score[1],
@@ -122,11 +133,12 @@ fn normal_point(whole_game: FullGame, who_scored: Player) -> FullGame {
             (whole_game.score[0].0, whole_game.score[0].1 + 10),
             whole_game.score[1],
         ],
+        // if is a game win it will show 41
         Player::Home if whole_game.score[0].1 == 40 => [
             (whole_game.score[0].0, whole_game.score[0].1 + 1),
             whole_game.score[1],
         ],
-        // OPPONENT
+        // OPPONENT SCORE POINTS
         Player::Oponent if whole_game.score[1].1 == 0 => [
             whole_game.score[0],
             (whole_game.score[1].0, whole_game.score[1].1 + 15),
@@ -145,7 +157,7 @@ fn normal_point(whole_game: FullGame, who_scored: Player) -> FullGame {
         ],
         _ => [whole_game.score[0], whole_game.score[1]],
     };
-
+    // if the game is 40 - 40 it will mark it as deuce
     if play[0].1 == 40 && play[1].1 == 40 {
         return FullGame {
             score: [(Player::Home, 0), (Player::Oponent, 0)],
@@ -154,6 +166,7 @@ fn normal_point(whole_game: FullGame, who_scored: Player) -> FullGame {
         };
     }
 
+    // if is a game win it will show 41 and game win will happen.
     if play[0].1 == 41 {
         return game_win(
             FullGame {
@@ -164,6 +177,7 @@ fn normal_point(whole_game: FullGame, who_scored: Player) -> FullGame {
             Player::Home,
         );
     }
+    // if is a game win it will show 41 and game win will happen.
     if play[1].1 == 41 {
         return game_win(
             FullGame {
@@ -174,7 +188,6 @@ fn normal_point(whole_game: FullGame, who_scored: Player) -> FullGame {
             Player::Oponent,
         );
     }
-
     return FullGame {
         score: play,
         stage: whole_game.stage,
@@ -217,6 +230,7 @@ fn deuce_point(whole_game: FullGame, who_scored: Player) -> FullGame {
     return updated_game;
 }
 
+/// Denotes in what stage of a set you are.
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Stage {
     Normal,
@@ -224,12 +238,14 @@ pub enum Stage {
     TieBreak,
 }
 
+/// Denotes the type of player
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Player {
     Home,
     Oponent,
 }
 
+/// Structures the game for the scores and the set
 #[derive(PartialEq, Debug)]
 pub struct FullGame {
     // First Tupple is Home
@@ -241,7 +257,7 @@ pub struct FullGame {
 }
 
 impl FullGame {
-    // creates a new game
+    /// creates a new initial game.
     pub fn new() -> Self {
         FullGame {
             score: [(Player::Home, 0), (Player::Oponent, 0)],
@@ -249,7 +265,7 @@ impl FullGame {
             sets: [(0, 0, false); 3],
         }
     }
-    // checks the stage of the game
+    /// Ads point to a player, adds depending on the stage of the game.
     pub fn add_point(self, point: Player) -> Self {
         let play = match self.stage {
             Stage::Normal => normal_point(self, point),
