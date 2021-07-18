@@ -472,7 +472,44 @@ mod tests {
     }
 
     #[test]
-    fn third_game_start_and_oponent_wins_first_deuce() {
+    fn long_tie_break_in_second_set() {
+        // HOME WINS
+        let game = FullGame {
+            score: [(Player::Home, 6), (Player::Oponent, 5)],
+            stage: Stage::TieBreak,
+            sets: [(7, 6, true), (6, 6, false), (0, 0, false)],
+        };
+        assert_eq!(
+            game.add_point(Player::Home),
+            FullGame {
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
+                stage: Stage::Normal,
+                sets: [(7, 6, true), (7, 6, true), (0, 0, false)],
+            }
+        );
+
+        // OPONENT WINS
+        let game2 = FullGame {
+            score: [(Player::Home, 6), (Player::Oponent, 5)],
+            stage: Stage::TieBreak,
+            sets: [(6, 7, true), (6, 6, false), (0, 0, false)],
+        };
+        assert_eq!(
+            game2
+                .add_point(Player::Oponent)
+                .add_point(Player::Oponent)
+                .add_point(Player::Oponent)
+                .add_point(Player::Oponent),
+            FullGame {
+                score: [(Player::Home, 0), (Player::Oponent, 15)],
+                stage: Stage::Normal,
+                sets: [(6, 7, true), (6, 7, true), (0, 0, false)],
+            }
+        );
+    }
+
+    #[test]
+    fn third_set_starts_and_oponent_wins_first_deuce() {
         let game = FullGame {
             score: [(Player::Home, 40), (Player::Oponent, 0)],
             stage: Stage::Normal,
