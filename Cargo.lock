@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "tennis-score"
+name = "tennis_score"
 version = "0.1.0"
