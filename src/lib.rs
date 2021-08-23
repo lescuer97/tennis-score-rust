@@ -42,6 +42,20 @@ pub mod tenis_actions {
                 list_history: self.list_history,
             }
         }
+
+        /// adds point to Gamescore, uses the inside function of Gamescore
+        pub fn roll_back_last_point(mut self) -> FullGame {
+            if self.list_history.is_empty() {
+                return self;
+            } else {
+                let rolled_back_point = self.list_history.pop();
+
+                FullGame {
+                    game_score: rolled_back_point.unwrap(),
+                    list_history: self.list_history,
+                }
+            }
+        }
     }
 
     /// Structures the game for the scores and the set

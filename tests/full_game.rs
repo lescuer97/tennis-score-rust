@@ -44,20 +44,40 @@ fn add_point() {
                 sets: [(0, 0, false); 3]
             },
             list_history: [GameScore {
-                    score: [(Player::Home, 0), (Player::Oponent, 0)],
-                    stage: Stage::Normal,
-                    sets: [(0, 0, false); 3],
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
+                stage: Stage::Normal,
+                sets: [(0, 0, false); 3],
             },]
             .to_vec(),
         }
     )
 }
-                    score: [(Player::Home, 15), (Player::Oponent, 0)],
-                    stage: Stage::Normal,
-                    sets: [(0, 0, false); 3],
-                }
-            ]
-            .to_vec(),
+
+#[test]
+fn roll_back_last_point() {
+    let game: FullGame = FullGame {
+        game_score: GameScore {
+            score: [(Player::Home, 15), (Player::Oponent, 0)],
+            stage: Stage::Normal,
+            sets: [(0, 0, false); 3],
+        },
+        list_history: [GameScore {
+            score: [(Player::Home, 0), (Player::Oponent, 0)],
+            stage: Stage::Normal,
+            sets: [(0, 0, false); 3],
+        }]
+        .to_vec(),
+    };
+
+    assert_eq!(
+        game.roll_back_last_point(),
+        FullGame {
+            game_score: GameScore {
+                score: [(Player::Home, 0), (Player::Oponent, 0)],
+                stage: Stage::Normal,
+                sets: [(0, 0, false); 3]
+            },
+            list_history: [].to_vec(),
         }
     )
     // }
