@@ -22,23 +22,22 @@ pub mod tenis_actions {
     impl FullGame {
         /// creates a new game fromscratch
         pub fn new() -> Self {
-            let mut vector: Vec<GameScore> = Vec::new();
-            vector.push(GameScore {
-                score: [(Player::Home, 0), (Player::Oponent, 0)],
-                stage: Stage::Normal,
-                sets: [(0, 0, false); 3],
-            });
+            let vector: Vec<GameScore> = Vec::new();
+
             FullGame {
                 game_score: GameScore::new(),
                 list_history: vector,
             }
         }
         /// adds point to Gamescore, uses the inside function of Gamescore
-        pub fn add_point(mut self, point: Player) -> Self {
-            let new_score: GameScore = self.game_score.add_point(point);
-            self.list_history.push(new_score);
+        pub fn add_point(mut self, point: Player) -> FullGame {
+            // adds score to the list before updating
+            self.list_history.push(self.game_score);
 
-            Self {
+            // adds point
+            let new_score: GameScore = self.game_score.add_point(point);
+
+            FullGame {
                 game_score: new_score,
                 list_history: self.list_history,
             }

@@ -19,12 +19,7 @@ fn initialize() {
                 stage: Stage::Normal,
                 sets: [(0, 0, false); 3]
             },
-            list_history: [GameScore {
-                score: [(Player::Home, 0), (Player::Oponent, 0)],
-                stage: Stage::Normal,
-                sets: [(0, 0, false); 3],
-            }]
-            .to_vec(),
+            list_history: [].to_vec(),
         }
     )
     // }
@@ -37,12 +32,7 @@ fn add_point() {
             stage: Stage::Normal,
             sets: [(0, 0, false); 3],
         },
-        list_history: [GameScore {
-            score: [(Player::Home, 0), (Player::Oponent, 0)],
-            stage: Stage::Normal,
-            sets: [(0, 0, false); 3],
-        }]
-        .to_vec(),
+        list_history: [].to_vec(),
     };
 
     assert_eq!(
@@ -53,13 +43,15 @@ fn add_point() {
                 stage: Stage::Normal,
                 sets: [(0, 0, false); 3]
             },
-            list_history: [
-                GameScore {
+            list_history: [GameScore {
                     score: [(Player::Home, 0), (Player::Oponent, 0)],
                     stage: Stage::Normal,
                     sets: [(0, 0, false); 3],
-                },
-                GameScore {
+            },]
+            .to_vec(),
+        }
+    )
+}
                     score: [(Player::Home, 15), (Player::Oponent, 0)],
                     stage: Stage::Normal,
                     sets: [(0, 0, false); 3],
