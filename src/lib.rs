@@ -58,6 +58,39 @@ pub mod tenis_actions {
         }
     }
     #[derive(PartialEq, Debug, Clone, Copy)]
+    pub struct Sets {
+        pub home: i8,
+        pub oponent: i8,
+        pub finished: bool,
+    }
+
+    impl Sets {
+        pub fn new() -> Self {
+            return Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            };
+        }
+
+        pub fn add_point(self, who_scored: Player) -> Sets {
+            match who_scored {
+                Player::Home => {
+                    return Sets {
+                        home: self.home + 1,
+                        ..self
+                    }
+                }
+                Player::Oponent => {
+                    return Sets {
+                        oponent: self.oponent + 1,
+                        ..self
+                    }
+                }
+            };
+        }
+    }
+    #[derive(PartialEq, Debug, Clone, Copy)]
     /// Current score for the game
     pub struct Score {
         pub home: i8,
@@ -131,7 +164,7 @@ pub mod tenis_actions {
         pub stage: Stage,
         // first is the home player and second the oponent
         // the bool is to check if the set is finished
-        pub sets: [(i8, i8, bool); 3],
+        pub sets: [Sets; 3],
     }
     /// Denotes the type of player
     #[derive(PartialEq, Debug, Clone, Copy)]
@@ -145,7 +178,7 @@ pub mod tenis_actions {
             Game {
                 score: Score::new(),
                 stage: Stage::Normal,
-                sets: [(0, 0, false); 3],
+                sets: [Sets::new(); 3],
             }
         }
         /// Ads point to a player, adds depending on the stage of the game.
@@ -235,23 +268,29 @@ pub mod tenis_actions {
             let mut done: bool = false;
 
             // check for sets that are finished and only writes on the first one that is not finished
-            let mut score: [(i8, i8, bool); 3] = match who_scored {
+            let mut score: [Sets; 3] = match who_scored {
                 // loops inside the array of sets
                 // checks that the game is not already done and the point is not added
-                Player::Home => self.sets.map(|set: (i8, i8, bool)| {
-                    if !set.2 && !done {
+                Player::Home => self.sets.map(|set: Sets| {
+                    if !set.finished && !done {
                         done = true;
-                        return (set.0 + 1, set.1, set.2);
+                        return Sets {
+                            home: set.home + 1,
+                            ..set
+                        };
                     } else {
                         set
                     }
                 }),
                 // loops inside the array of sets
                 // checks that the game is not already done and the point is not added
-                Player::Oponent => self.sets.map(|set: (i8, i8, bool)| {
-                    if !set.2 && !done {
+                Player::Oponent => self.sets.map(|set: Sets| {
+                    if !set.finished && !done {
                         done = true;
-                        return (set.0, set.1 + 1, set.2);
+                        return Sets {
+                            oponent: set.oponent + 1,
+                            ..set
+                        };
                     } else {
                         return set;
                     }
@@ -259,25 +298,45 @@ pub mod tenis_actions {
             };
 
             // THIS CHECKS IF SET WAS WON
-            score = score.map(|set: (i8, i8, bool)| {
-                let difference: i8 = set.0 - set.1;
+            score = score.map(|set: Sets| {
+                let difference: i8 = set.home - set.oponent;
                 // FOR Home SET WIN
                 // this checks tiebreak win
-                if difference == 1 && set.1 == 6 && !set.2 && self.stage == Stage::TieBreak {
-                    return (set.0, set.1, true);
+                if difference == 1
+                    && set.oponent == 6
+                    && !set.finished
+                    && self.stage == Stage::TieBreak
+                {
+                    return Sets {
+                        finished: true,
+                        ..set
+                    };
                 }
                 // checks normal set win
-                if difference == 2 && set.1 >= 4 && !set.2 {
-                    return (set.0, set.1, true);
+                if difference == 2 && set.oponent >= 4 && !set.finished {
+                    return Sets {
+                        finished: true,
+                        ..set
+                    };
                 }
                 // FOR OPPOSITION SET WIN
                 // this check tiebreak win
-                if difference == -1 && set.0 == 6 && !set.2 && self.stage == Stage::TieBreak {
-                    return (set.0, set.1, true);
+                if difference == -1
+                    && set.home == 6
+                    && !set.finished
+                    && self.stage == Stage::TieBreak
+                {
+                    return Sets {
+                        finished: true,
+                        ..set
+                    };
                 }
                 // checks normal set win
-                if difference == -2 && set.0 >= 4 && !set.2 {
-                    return (set.0, set.1, true);
+                if difference == -2 && set.home >= 4 && !set.finished {
+                    return Sets {
+                        finished: true,
+                        ..set
+                    };
                 }
                 return set;
             });
@@ -285,8 +344,8 @@ pub mod tenis_actions {
             let mut activate_tie_break: bool = false;
 
             // THIS CHECKS IF there is a tieBreak and sets the tie_break up if 6 - 6 and not already on tiebreak
-            score = score.map(|set: (i8, i8, bool)| {
-                if set.0 == 6 && set.1 == 6 && self.stage != Stage::TieBreak {
+            score = score.map(|set: Sets| {
+                if set.home == 6 && set.oponent == 6 && self.stage != Stage::TieBreak {
                     activate_tie_break = true;
                     return set;
                 } else {

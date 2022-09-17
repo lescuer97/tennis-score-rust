@@ -4,7 +4,7 @@
 // mod tests {
 //     use super::*;
 // mod tenis_actions;
-use tennis_score::tenis_actions::{Game, Player, Score, Stage};
+use tennis_score::tenis_actions::{Game, Player, Score, Sets, Stage};
 
 #[test]
 fn initialize() {
@@ -16,7 +16,11 @@ fn initialize() {
                 oponent: 0,
             },
             stage: Stage::Normal,
-            sets: [(0, 0, false); 3]
+            sets: [Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            }; 3]
         }
     )
 }
@@ -28,7 +32,11 @@ fn add_point_test() {
             oponent: 0,
         },
         stage: Stage::Normal,
-        sets: [(0, 0, false); 3],
+        sets: [Sets {
+            home: 0,
+            oponent: 0,
+            finished: false,
+        }; 3],
     };
     assert_eq!(
         game.add_point(Player::Home).add_point(Player::Oponent),
@@ -38,7 +46,11 @@ fn add_point_test() {
                 oponent: 15,
             },
             stage: Stage::Normal,
-            sets: [(0, 0, false); 3],
+            sets: [Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            }; 3],
         }
     );
 }
@@ -50,7 +62,11 @@ fn make_deuce() {
             oponent: 40,
         },
         stage: Stage::Normal,
-        sets: [(0, 0, false); 3],
+        sets: [Sets {
+            home: 0,
+            oponent: 0,
+            finished: false,
+        }; 3],
     };
     assert_eq!(
         game.add_point(Player::Home),
@@ -60,7 +76,11 @@ fn make_deuce() {
                 oponent: 0,
             },
             stage: Stage::Deuce,
-            sets: [(0, 0, false); 3],
+            sets: [Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            }; 3],
         }
     );
 }
@@ -72,7 +92,11 @@ fn solve_deuce() {
             oponent: 0,
         },
         stage: Stage::Deuce,
-        sets: [(0, 0, false); 3],
+        sets: [Sets {
+            home: 0,
+            oponent: 0,
+            finished: false,
+        }; 3],
     };
     assert_eq!(
         game.add_point(Player::Home),
@@ -82,7 +106,23 @@ fn solve_deuce() {
                 oponent: 0,
             },
             stage: Stage::Normal,
-            sets: [(1, 0, false), (0, 0, false), (0, 0, false)],
+            sets: [
+                Sets {
+                    home: 1,
+                    oponent: 0,
+                    finished: false,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                }
+            ],
         }
     );
 }
@@ -94,7 +134,11 @@ fn first_game_win() {
             oponent: 30,
         },
         stage: Stage::Normal,
-        sets: [(0, 0, false); 3],
+        sets: [Sets {
+            home: 0,
+            oponent: 0,
+            finished: false,
+        }; 3],
     };
     assert_eq!(
         game.add_point(Player::Home),
@@ -104,7 +148,23 @@ fn first_game_win() {
                 oponent: 0,
             },
             stage: Stage::Normal,
-            sets: [(1, 0, false), (0, 0, false), (0, 0, false)],
+            sets: [
+                Sets {
+                    home: 1,
+                    oponent: 0,
+                    finished: false,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                }
+            ],
         }
     );
     let game2 = Game {
@@ -113,7 +173,11 @@ fn first_game_win() {
             oponent: 40,
         },
         stage: Stage::Normal,
-        sets: [(0, 0, false); 3],
+        sets: [Sets {
+            home: 0,
+            oponent: 0,
+            finished: false,
+        }; 3],
     };
     assert_eq!(
         game2.add_point(Player::Oponent),
@@ -123,7 +187,23 @@ fn first_game_win() {
                 oponent: 0,
             },
             stage: Stage::Normal,
-            sets: [(0, 1, false), (0, 0, false), (0, 0, false)],
+            sets: [
+                Sets {
+                    home: 0,
+                    oponent: 1,
+                    finished: false,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                }
+            ],
         }
     );
 }
@@ -135,7 +215,23 @@ fn check_first_game_turns_true() {
             oponent: 30,
         },
         stage: Stage::Normal,
-        sets: [(5, 4, false), (0, 0, false), (0, 0, false)],
+        sets: [
+            Sets {
+                home: 5,
+                oponent: 4,
+                finished: false,
+            },
+            Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            },
+            Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            },
+        ],
     };
     assert_eq!(
         game.add_point(Player::Home),
@@ -145,7 +241,23 @@ fn check_first_game_turns_true() {
                 oponent: 0,
             },
             stage: Stage::Normal,
-            sets: [(6, 4, true), (0, 0, false), (0, 0, false)],
+            sets: [
+                Sets {
+                    home: 6,
+                    oponent: 4,
+                    finished: true,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                }
+            ],
         }
     );
 }
@@ -158,7 +270,23 @@ fn second_game_win() {
             oponent: 30,
         },
         stage: Stage::Normal,
-        sets: [(6, 4, true), (0, 0, false), (0, 0, false)],
+        sets: [
+            Sets {
+                home: 6,
+                oponent: 4,
+                finished: true,
+            },
+            Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            },
+            Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            },
+        ],
     };
     assert_eq!(
         game.add_point(Player::Home),
@@ -168,7 +296,23 @@ fn second_game_win() {
                 oponent: 0,
             },
             stage: Stage::Normal,
-            sets: [(6, 4, true), (1, 0, false), (0, 0, false)],
+            sets: [
+                Sets {
+                    home: 6,
+                    oponent: 4,
+                    finished: true,
+                },
+                Sets {
+                    home: 1,
+                    oponent: 0,
+                    finished: false,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                },
+            ],
         }
     );
 }
@@ -181,7 +325,23 @@ fn check_second_game_win_true() {
             oponent: 30,
         },
         stage: Stage::Normal,
-        sets: [(6, 4, true), (5, 4, false), (0, 0, false)],
+        sets: [
+            Sets {
+                home: 6,
+                oponent: 4,
+                finished: true,
+            },
+            Sets {
+                home: 5,
+                oponent: 4,
+                finished: false,
+            },
+            Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            },
+        ],
     };
     assert_eq!(
         game.add_point(Player::Home),
@@ -191,7 +351,23 @@ fn check_second_game_win_true() {
                 oponent: 0,
             },
             stage: Stage::Normal,
-            sets: [(6, 4, true), (6, 4, true), (0, 0, false)],
+            sets: [
+                Sets {
+                    home: 6,
+                    oponent: 4,
+                    finished: true,
+                },
+                Sets {
+                    home: 6,
+                    oponent: 4,
+                    finished: true,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                },
+            ],
         }
     );
 }
@@ -203,7 +379,23 @@ fn check_deuce_and_then_tie_break() {
             oponent: 30,
         },
         stage: Stage::Normal,
-        sets: [(6, 5, false), (0, 0, false), (0, 0, false)],
+        sets: [
+            Sets {
+                home: 6,
+                oponent: 5,
+                finished: false,
+            },
+            Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            },
+            Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            },
+        ],
     };
     assert_eq!(
         game.add_point(Player::Home)
@@ -216,7 +408,23 @@ fn check_deuce_and_then_tie_break() {
                 oponent: 0,
             },
             stage: Stage::TieBreak,
-            sets: [(6, 6, false), (0, 0, false), (0, 0, false)],
+            sets: [
+                Sets {
+                    home: 6,
+                    oponent: 6,
+                    finished: false,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                },
+            ],
         }
     );
 }
@@ -228,7 +436,23 @@ fn solve_tie_break() {
             oponent: 5,
         },
         stage: Stage::TieBreak,
-        sets: [(6, 6, false), (0, 0, false), (0, 0, false)],
+        sets: [
+            Sets {
+                home: 6,
+                oponent: 6,
+                finished: false,
+            },
+            Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            },
+            Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            },
+        ],
     };
     assert_eq!(
         game.add_point(Player::Home),
@@ -238,7 +462,23 @@ fn solve_tie_break() {
                 oponent: 0,
             },
             stage: Stage::Normal,
-            sets: [(7, 6, true), (0, 0, false), (0, 0, false)],
+            sets: [
+                Sets {
+                    home: 7,
+                    oponent: 6,
+                    finished: true,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                },
+            ],
         }
     );
     let game2 = Game {
@@ -247,7 +487,23 @@ fn solve_tie_break() {
             oponent: 5,
         },
         stage: Stage::TieBreak,
-        sets: [(6, 6, false), (0, 0, false), (0, 0, false)],
+        sets: [
+            Sets {
+                home: 6,
+                oponent: 6,
+                finished: false,
+            },
+            Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            },
+            Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            },
+        ],
     };
     assert_eq!(
         game2
@@ -261,7 +517,23 @@ fn solve_tie_break() {
                 oponent: 15,
             },
             stage: Stage::Normal,
-            sets: [(6, 7, true), (0, 0, false), (0, 0, false)],
+            sets: [
+                Sets {
+                    home: 6,
+                    oponent: 7,
+                    finished: true,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                },
+            ],
         }
     );
 }
@@ -275,7 +547,23 @@ fn long_tie_break_in_second_set() {
             oponent: 5,
         },
         stage: Stage::TieBreak,
-        sets: [(7, 6, true), (6, 6, false), (0, 0, false)],
+        sets: [
+            Sets {
+                home: 7,
+                oponent: 6,
+                finished: true,
+            },
+            Sets {
+                home: 6,
+                oponent: 6,
+                finished: false,
+            },
+            Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            },
+        ],
     };
     assert_eq!(
         game.add_point(Player::Home),
@@ -285,7 +573,23 @@ fn long_tie_break_in_second_set() {
                 oponent: 0,
             },
             stage: Stage::Normal,
-            sets: [(7, 6, true), (7, 6, true), (0, 0, false)],
+            sets: [
+                Sets {
+                    home: 7,
+                    oponent: 6,
+                    finished: true,
+                },
+                Sets {
+                    home: 7,
+                    oponent: 6,
+                    finished: true,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                },
+            ],
         }
     );
 
@@ -296,7 +600,23 @@ fn long_tie_break_in_second_set() {
             oponent: 5,
         },
         stage: Stage::TieBreak,
-        sets: [(6, 7, true), (6, 6, false), (0, 0, false)],
+        sets: [
+            Sets {
+                home: 6,
+                oponent: 7,
+                finished: true,
+            },
+            Sets {
+                home: 6,
+                oponent: 6,
+                finished: false,
+            },
+            Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            },
+        ],
     };
     assert_eq!(
         game2
@@ -310,7 +630,23 @@ fn long_tie_break_in_second_set() {
                 oponent: 15,
             },
             stage: Stage::Normal,
-            sets: [(6, 7, true), (6, 7, true), (0, 0, false)],
+            sets: [
+                Sets {
+                    home: 6,
+                    oponent: 7,
+                    finished: true,
+                },
+                Sets {
+                    home: 6,
+                    oponent: 7,
+                    finished: true,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                },
+            ],
         }
     );
 }
@@ -323,7 +659,23 @@ fn third_set_starts_and_oponent_wins_first_deuce() {
             oponent: 0,
         },
         stage: Stage::Normal,
-        sets: [(7, 6, true), (6, 5, false), (0, 0, false)],
+        sets: [
+            Sets {
+                home: 7,
+                oponent: 6,
+                finished: true,
+            },
+            Sets {
+                home: 6,
+                oponent: 5,
+                finished: false,
+            },
+            Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            },
+        ],
     };
     assert_eq!(
         game.add_point(Player::Home)
@@ -343,7 +695,23 @@ fn third_set_starts_and_oponent_wins_first_deuce() {
                 oponent: 0,
             },
             stage: Stage::Normal,
-            sets: [(7, 6, true), (7, 5, true), (0, 1, false)],
+            sets: [
+                Sets {
+                    home: 7,
+                    oponent: 6,
+                    finished: true,
+                },
+                Sets {
+                    home: 7,
+                    oponent: 5,
+                    finished: true,
+                },
+                Sets {
+                    home: 0,
+                    oponent: 1,
+                    finished: false,
+                },
+            ],
         }
     );
 }

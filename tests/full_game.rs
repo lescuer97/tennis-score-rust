@@ -4,7 +4,7 @@
 //     use super::*;
 
 // pub mod tenis_actions;
-use tennis_score::tenis_actions::{FullGame, Game, Player, Score, Stage};
+use tennis_score::tenis_actions::{FullGame, Game, Player, Score, Sets, Stage};
 #[test]
 fn initialize() {
     let game: FullGame = FullGame::new();
@@ -20,7 +20,11 @@ fn initialize() {
                     oponent: 0,
                 },
                 stage: Stage::Normal,
-                sets: [(0, 0, false); 3]
+                sets: [Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                }; 3]
             },
             list_history: [].to_vec(),
         }
@@ -36,7 +40,11 @@ fn add_point() {
                 oponent: 0,
             },
             stage: Stage::Normal,
-            sets: [(0, 0, false); 3],
+            sets: [Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            }; 3],
         },
         list_history: [].to_vec(),
     };
@@ -50,7 +58,11 @@ fn add_point() {
                     oponent: 0,
                 },
                 stage: Stage::Normal,
-                sets: [(0, 0, false); 3]
+                sets: [Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                }; 3]
             },
             list_history: [Game {
                 score: Score {
@@ -58,7 +70,11 @@ fn add_point() {
                     oponent: 0,
                 },
                 stage: Stage::Normal,
-                sets: [(0, 0, false); 3],
+                sets: [Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                }; 3],
             },]
             .to_vec(),
         }
@@ -74,7 +90,11 @@ fn roll_back_last_point() {
                 oponent: 0,
             },
             stage: Stage::Normal,
-            sets: [(0, 0, false); 3],
+            sets: [Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            }; 3],
         },
         list_history: [Game {
             score: Score {
@@ -82,7 +102,11 @@ fn roll_back_last_point() {
                 oponent: 0,
             },
             stage: Stage::Normal,
-            sets: [(0, 0, false); 3],
+            sets: [Sets {
+                home: 0,
+                oponent: 0,
+                finished: false,
+            }; 3],
         }]
         .to_vec(),
     };
@@ -96,7 +120,11 @@ fn roll_back_last_point() {
                     oponent: 0,
                 },
                 stage: Stage::Normal,
-                sets: [(0, 0, false); 3]
+                sets: [Sets {
+                    home: 0,
+                    oponent: 0,
+                    finished: false,
+                }; 3]
             },
             list_history: [].to_vec(),
         }
