@@ -4,7 +4,7 @@
 //     use super::*;
 
 // pub mod tenis_actions;
-use tennis_score::tenis_actions::{FullGame, GameScore, Player, Stage};
+use tennis_score::tenis_actions::{FullGame, Game, Player, Score, Stage};
 #[test]
 fn initialize() {
     let game: FullGame = FullGame::new();
@@ -14,8 +14,11 @@ fn initialize() {
     assert_eq!(
         game,
         FullGame {
-            game_score: GameScore {
-                score: [(Player::Home, 0), (Player::Oponent, 0)],
+            game_score: Game {
+                score: Score {
+                    home: 0,
+                    oponent: 0,
+                },
                 stage: Stage::Normal,
                 sets: [(0, 0, false); 3]
             },
@@ -27,8 +30,11 @@ fn initialize() {
 #[test]
 fn add_point() {
     let game: FullGame = FullGame {
-        game_score: GameScore {
-            score: [(Player::Home, 0), (Player::Oponent, 0)],
+        game_score: Game {
+            score: Score {
+                home: 0,
+                oponent: 0,
+            },
             stage: Stage::Normal,
             sets: [(0, 0, false); 3],
         },
@@ -38,13 +44,19 @@ fn add_point() {
     assert_eq!(
         game.add_point(Player::Home),
         FullGame {
-            game_score: GameScore {
-                score: [(Player::Home, 15), (Player::Oponent, 0)],
+            game_score: Game {
+                score: Score {
+                    home: 15,
+                    oponent: 0,
+                },
                 stage: Stage::Normal,
                 sets: [(0, 0, false); 3]
             },
-            list_history: [GameScore {
-                score: [(Player::Home, 0), (Player::Oponent, 0)],
+            list_history: [Game {
+                score: Score {
+                    home: 0,
+                    oponent: 0,
+                },
                 stage: Stage::Normal,
                 sets: [(0, 0, false); 3],
             },]
@@ -56,13 +68,19 @@ fn add_point() {
 #[test]
 fn roll_back_last_point() {
     let game: FullGame = FullGame {
-        game_score: GameScore {
-            score: [(Player::Home, 15), (Player::Oponent, 0)],
+        game_score: Game {
+            score: Score {
+                home: 15,
+                oponent: 0,
+            },
             stage: Stage::Normal,
             sets: [(0, 0, false); 3],
         },
-        list_history: [GameScore {
-            score: [(Player::Home, 0), (Player::Oponent, 0)],
+        list_history: [Game {
+            score: Score {
+                home: 0,
+                oponent: 0,
+            },
             stage: Stage::Normal,
             sets: [(0, 0, false); 3],
         }]
@@ -72,8 +90,11 @@ fn roll_back_last_point() {
     assert_eq!(
         game.roll_back_last_point(),
         FullGame {
-            game_score: GameScore {
-                score: [(Player::Home, 0), (Player::Oponent, 0)],
+            game_score: Game {
+                score: Score {
+                    home: 0,
+                    oponent: 0,
+                },
                 stage: Stage::Normal,
                 sets: [(0, 0, false); 3]
             },

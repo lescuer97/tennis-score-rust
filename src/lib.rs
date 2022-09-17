@@ -16,16 +16,16 @@ pub mod tenis_actions {
     #[derive(PartialEq, Debug, Clone)]
 
     pub struct FullGame {
-        pub game_score: GameScore,
-        pub list_history: Vec<GameScore>,
+        pub game_score: Game,
+        pub list_history: Vec<Game>,
     }
     impl FullGame {
         /// creates a new game fromscratch
         pub fn new() -> Self {
-            let vector: Vec<GameScore> = Vec::new();
+            let vector: Vec<Game> = Vec::new();
 
             FullGame {
-                game_score: GameScore::new(),
+                game_score: Game::new(),
                 list_history: vector,
             }
         }
@@ -35,11 +35,11 @@ pub mod tenis_actions {
             self.list_history.push(self.game_score);
 
             // adds point
-            let new_score: GameScore = self.game_score.add_point(point);
+            let new_score: Game = self.game_score.add_point(point);
 
             FullGame {
                 game_score: new_score,
-                list_history: self.list_history,
+                ..self
             }
         }
 
@@ -52,17 +52,82 @@ pub mod tenis_actions {
 
                 FullGame {
                     game_score: rolled_back_point.unwrap(),
-                    list_history: self.list_history,
+                    ..self
                 }
             }
+        }
+    }
+    #[derive(PartialEq, Debug, Clone, Copy)]
+    /// Current score for the game
+    pub struct Score {
+        pub home: i8,
+        pub oponent: i8,
+    }
+    impl Score {
+        /// Creates a new game
+        pub fn new() -> Self {
+            return Score {
+                home: 0,
+                oponent: 0,
+            };
+        }
+        /// Adds point to Game
+        pub fn normal_point(self, who_scored: Player) -> Score {
+            let score_to_change: i8 = match who_scored {
+                Player::Home => self.home,
+                Player::Oponent => self.oponent,
+            };
+
+            let new_score: i8 = match score_to_change {
+                0 => 15,
+                15 => 30,
+                30 => 40,
+                // if is a game win it will show 41
+                40 => 41,
+                _ => score_to_change,
+            };
+            match who_scored {
+                Player::Home => {
+                    return Score {
+                        home: new_score,
+                        ..self
+                    }
+                }
+                Player::Oponent => {
+                    return Score {
+                        oponent: new_score,
+                        ..self
+                    }
+                }
+            };
+        }
+        pub fn deuce_tiebreak_point(self, who_scored: Player) -> Score {
+            match who_scored {
+                Player::Home => {
+                    return Score {
+                        home: self.home + 1,
+                        ..self
+                    }
+                }
+                Player::Oponent => {
+                    return Score {
+                        oponent: self.oponent + 1,
+                        ..self
+                    }
+                }
+            };
+        }
+
+        pub fn get_score_diference(self) -> i8 {
+            return self.home - self.oponent;
         }
     }
 
     /// Structures the game for the scores and the set
     #[derive(PartialEq, Debug, Clone, Copy)]
-    pub struct GameScore {
+    pub struct Game {
         // First Tupple is Home
-        pub score: [(Player, i8); 2],
+        pub score: Score,
         pub stage: Stage,
         // first is the home player and second the oponent
         // the bool is to check if the set is finished
@@ -74,11 +139,11 @@ pub mod tenis_actions {
         Home,
         Oponent,
     }
-    impl GameScore {
+    impl Game {
         /// creates a new initial game.
         pub fn new() -> Self {
-            GameScore {
-                score: [(Player::Home, 0), (Player::Oponent, 0)],
+            Game {
+                score: Score::new(),
                 stage: Stage::Normal,
                 sets: [(0, 0, false); 3],
             }
@@ -94,82 +159,45 @@ pub mod tenis_actions {
             return play;
         }
         /// Adds point a Normal Stage Game, depending on the score.
-        fn normal_point(self, who_scored: Player) -> GameScore {
-            let play = match who_scored {
-                // HOME SCORE POINTS
-                Player::Home if self.score[0].1 == 0 => {
-                    [(self.score[0].0, self.score[0].1 + 15), self.score[1]]
-                }
-                Player::Home if self.score[0].1 == 15 => {
-                    [(self.score[0].0, self.score[0].1 + 15), self.score[1]]
-                }
-                Player::Home if self.score[0].1 == 30 => {
-                    [(self.score[0].0, self.score[0].1 + 10), self.score[1]]
-                }
-                // if is a game win it will show 41
-                Player::Home if self.score[0].1 == 40 => {
-                    [(self.score[0].0, self.score[0].1 + 1), self.score[1]]
-                }
-                // OPPONENT SCORE POINTS
-                Player::Oponent if self.score[1].1 == 0 => {
-                    [self.score[0], (self.score[1].0, self.score[1].1 + 15)]
-                }
-                Player::Oponent if self.score[1].1 == 15 => {
-                    [self.score[0], (self.score[1].0, self.score[1].1 + 15)]
-                }
-                Player::Oponent if self.score[1].1 == 30 => {
-                    [self.score[0], (self.score[1].0, self.score[1].1 + 10)]
-                }
-                Player::Oponent if self.score[1].1 == 40 => {
-                    [self.score[0], (self.score[1].0, self.score[1].1 + 1)]
-                }
-                _ => [self.score[0], self.score[1]],
-            };
+        fn normal_point(self, who_scored: Player) -> Game {
+            let play = self.score.normal_point(who_scored);
+
             // if the game is 40 - 40 it will mark it as deuce
-            if play[0].1 == 40 && play[1].1 == 40 {
-                return GameScore {
-                    score: [(Player::Home, 0), (Player::Oponent, 0)],
+            if play.home == 40 && play.oponent == 40 {
+                return Game {
+                    score: Score::new(),
                     stage: Stage::Deuce,
-                    sets: self.sets,
+                    ..self
                 };
             }
-            let updated_game = GameScore {
+            let updated_game: Game = Game {
                 score: play,
-                stage: self.stage,
-                sets: self.sets,
+                ..self
             };
             // if is a game win it will show 41 and game win will happen.
-            if play[0].1 == 41 {
+            if play.home == 41 {
                 return updated_game.game_win(Player::Home);
             }
 
             // if is a game win it will show 41 and game win will happen.
-            if play[1].1 == 41 {
+            if play.oponent == 41 {
                 return updated_game.game_win(Player::Oponent);
             }
-            return GameScore {
+            return Game {
                 score: play,
-                stage: self.stage,
-                sets: self.sets,
+                ..self
             };
         }
-        fn deuce_point(self, who_scored: Player) -> GameScore {
+
+        fn deuce_point(self, who_scored: Player) -> Game {
             // adds point to the correct player
-            let updated_game = match who_scored {
-                Player::Home => GameScore {
-                    score: [(Player::Home, self.score[0].1 + 1), self.score[1]],
-                    stage: self.stage,
-                    sets: self.sets,
-                },
-                Player::Oponent => GameScore {
-                    score: [self.score[0], (Player::Oponent, self.score[1].1 + 1)],
-                    stage: self.stage,
-                    sets: self.sets,
-                },
+            let updated_game = Game {
+                score: self.score.deuce_tiebreak_point(who_scored),
+                ..self
             };
 
             // Difference in point in between PLayer Home and Player Oponent
-            let difference = updated_game.score[0].1 - updated_game.score[1].1;
+            let difference = updated_game.score.get_score_diference();
 
             // if the difference in beetween point is 2 it goes to game add
             if difference >= 2 {
@@ -181,36 +209,29 @@ pub mod tenis_actions {
 
             return updated_game;
         }
+
         /// Adds point in the tie break
-        fn tie_break_point(self, who_scored: Player) -> GameScore {
-            let play = match who_scored {
-                // HOME
-                Player::Home => [(self.score[0].0, self.score[0].1 + 1), self.score[1]],
-
-                // OPPONENT
-                Player::Oponent => [self.score[0], (self.score[1].0, self.score[1].1 + 1)],
-            };
-            let updated_game = GameScore {
-                score: play,
-                stage: self.stage,
-                sets: self.sets,
+        fn tie_break_point(self, who_scored: Player) -> Game {
+            let updated_game = Game {
+                score: self.score.deuce_tiebreak_point(who_scored),
+                ..self
             };
 
-            let difference = updated_game.score[0].1 - updated_game.score[1].1;
+            let difference = updated_game.score.get_score_diference();
             // HOME Wins Game, if gets to six and difference is bigger than 2 point
-            if difference == 2 && updated_game.score[0].1 >= 6 {
+            if difference == 2 && updated_game.score.home >= 6 {
                 return updated_game.game_win(Player::Home);
             }
 
             // Oposition wins game, if gets to six and difference is bigger than 2 point
-            if difference == -2 && updated_game.score[1].1 >= 6 {
+            if difference == -2 && updated_game.score.oponent >= 6 {
                 return updated_game.game_win(Player::Oponent);
             }
             return updated_game;
         }
 
         /// adds game point if the game was won
-        fn game_win(self, who_scored: Player) -> GameScore {
+        fn game_win(self, who_scored: Player) -> Game {
             let mut done: bool = false;
 
             // check for sets that are finished and only writes on the first one that is not finished
@@ -274,15 +295,15 @@ pub mod tenis_actions {
             });
 
             if activate_tie_break {
-                return GameScore {
-                    score: [(Player::Home, 0), (Player::Oponent, 0)],
+                return Game {
+                    score: Score::new(),
                     stage: Stage::TieBreak,
                     sets: score,
                 };
             }
 
-            return GameScore {
-                score: [(Player::Home, 0), (Player::Oponent, 0)],
+            return Game {
+                score: Score::new(),
                 stage: Stage::Normal,
                 sets: score,
             };
