@@ -56,6 +56,29 @@ pub mod tenis_actions {
                 }
             }
         }
+        /// Clears Entire Game Point
+        pub fn clear_game(self) -> FullGame {
+            return FullGame {
+                game_score: Game::new(),
+                ..self
+            };
+        }
+        /// Set game to a specific point
+        pub fn roll_back_to_specific_point(&self, index: usize) -> FullGame {
+            if self.list_history.len() >= index {
+                let value_to_set: Game = self.list_history[index];
+                let mut list_array: Vec<Game> = self.list_history.to_owned();
+
+                list_array.truncate(index);
+
+                return FullGame {
+                    game_score: value_to_set,
+                    list_history: list_array,
+                };
+            } else {
+                return self.to_owned();
+            }
+        }
     }
     #[derive(PartialEq, Debug, Clone, Copy)]
     pub struct Sets {
