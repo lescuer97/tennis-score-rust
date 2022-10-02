@@ -4,7 +4,7 @@
 //     use super::*;
 
 // pub mod tenis_actions;
-use tennis_score::tenis_actions::{FullGame, Game, Player, Score, Sets, Stage};
+use rust_lib::tenis_actions::{FullGame, Game, Player, Score, Sets, Stage};
 #[test]
 fn initialize() {
     let game: FullGame = FullGame::new();
