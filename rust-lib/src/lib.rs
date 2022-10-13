@@ -1,11 +1,11 @@
-//! # tennis-score
+//! > <C-p> :fzf<CR># tennis-score
 //!
 //! `tennis-score` is a little "in development" app that lets you play tennis and in the future
 //! be able to be put in a micro controller so you can carry it to play games.
 pub mod tenis_actions {
 
     /// Denotes in what stage of a set you are.
-    #[derive(PartialEq, Debug, Clone, Copy)]
+    #[derive(PartialEq, Eq, Debug, Clone, Copy)]
     pub enum Stage {
         Normal,
         Deuce,
@@ -13,11 +13,23 @@ pub mod tenis_actions {
     }
 
     // use tinyvec::ArrayVec;
-    #[derive(PartialEq, Debug, Clone)]
+    #[derive(PartialEq, Eq, Debug, Clone)]
 
     pub struct FullGame {
         pub game_score: Game,
         pub list_history: Vec<Game>,
+    }
+    impl Default for FullGame {
+   fn default()-> Self {
+    let vector: Vec<Game> = Vec::new();
+      FullGame {                    
+ 
+
+                     game_score: Game::new(),
+                  list_history: vector,                                       
+              }
+
+   }
     }
     impl FullGame {
         /// creates a new game fromscratch
@@ -46,7 +58,7 @@ pub mod tenis_actions {
         /// adds point to Gamescore, uses the inside function of Gamescore
         pub fn roll_back_last_point(mut self) -> FullGame {
             if self.list_history.is_empty() {
-                return self;
+                self
             } else {
                 let rolled_back_point = self.list_history.pop();
 
@@ -58,10 +70,10 @@ pub mod tenis_actions {
         }
         /// Clears Entire Game Point
         pub fn clear_game(self) -> FullGame {
-            return FullGame {
+            FullGame {
                 game_score: Game::new(),
                 ..self
-            };
+            }
         }
         /// Set game to a specific point
         pub fn roll_back_to_specific_point(&self, index: usize) -> FullGame {
@@ -71,49 +83,48 @@ pub mod tenis_actions {
 
                 list_array.truncate(index);
 
-                return FullGame {
+                FullGame {
                     game_score: value_to_set,
                     list_history: list_array,
-                };
+                }
+                
             } else {
-                return self.to_owned();
+                self.to_owned()
             }
         }
     }
-    #[derive(PartialEq, Debug, Clone, Copy)]
+    #[derive(PartialEq, Eq, Debug, Clone, Copy, Default)]
     pub struct Sets {
         pub home: i8,
         pub oponent: i8,
         pub finished: bool,
     }
-
     impl Sets {
         pub fn new() -> Self {
-            return Sets {
-                home: 0,
+            Sets { home: 0,
                 oponent: 0,
                 finished: false,
-            };
+            }
         }
 
         pub fn add_point(self, who_scored: Player) -> Sets {
             match who_scored {
                 Player::Home => {
-                    return Sets {
+                     Sets {
                         home: self.home + 1,
                         ..self
                     }
                 }
                 Player::Oponent => {
-                    return Sets {
+                    Sets {
                         oponent: self.oponent + 1,
                         ..self
                     }
                 }
-            };
+            }
         }
     }
-    #[derive(PartialEq, Debug, Clone, Copy)]
+    #[derive(PartialEq, Debug,Eq , Default, Clone, Copy)]
     /// Current score for the game
     pub struct Score {
         pub home: i8,
@@ -122,10 +133,10 @@ pub mod tenis_actions {
     impl Score {
         /// Creates a new game
         pub fn new() -> Self {
-            return Score {
+            Score {
                 home: 0,
                 oponent: 0,
-            };
+            }
         }
         /// Adds point to Game
         pub fn normal_point(self, who_scored: Player) -> Score {
@@ -144,43 +155,43 @@ pub mod tenis_actions {
             };
             match who_scored {
                 Player::Home => {
-                    return Score {
+                    Score {
                         home: new_score,
                         ..self
                     }
                 }
                 Player::Oponent => {
-                    return Score {
+                    Score {
                         oponent: new_score,
                         ..self
                     }
                 }
-            };
+            }
         }
         pub fn deuce_tiebreak_point(self, who_scored: Player) -> Score {
             match who_scored {
                 Player::Home => {
-                    return Score {
+                     Score {
                         home: self.home + 1,
                         ..self
                     }
                 }
                 Player::Oponent => {
-                    return Score {
+                    Score {
                         oponent: self.oponent + 1,
                         ..self
                     }
                 }
-            };
+            }
         }
 
         pub fn get_score_diference(self) -> i8 {
-            return self.home - self.oponent;
+             self.home - self.oponent
         }
     }
 
     /// Structures the game for the scores and the set
-    #[derive(PartialEq, Debug, Clone, Copy)]
+    #[derive(PartialEq, Eq,Debug, Clone, Copy)]
     pub struct Game {
         // First Tupple is Home
         pub score: Score,
@@ -190,10 +201,20 @@ pub mod tenis_actions {
         pub sets: [Sets; 3],
     }
     /// Denotes the type of player
-    #[derive(PartialEq, Debug, Clone, Copy)]
+    #[derive(PartialEq, Eq,Debug, Clone, Copy)]
     pub enum Player {
         Home,
         Oponent,
+    }
+    impl Default for Game {
+    fn default() -> Self {
+             Game {
+                score: Score::new(),
+                stage: Stage::Normal,
+                sets: [Sets::new(); 3],
+            }
+
+        }    
     }
     impl Game {
         /// creates a new initial game.
@@ -206,13 +227,12 @@ pub mod tenis_actions {
         }
         /// Ads point to a player, adds depending on the stage of the game.
         pub fn add_point(self, point: Player) -> Self {
-            let play = match self.stage {
+             match self.stage {
                 Stage::Normal => self.normal_point(point),
                 Stage::Deuce => self.deuce_point(point),
                 Stage::TieBreak => self.tie_break_point(point),
-            };
+            }
 
-            return play;
         }
         /// Adds point a Normal Stage Game, depending on the score.
         fn normal_point(self, who_scored: Player) -> Game {
@@ -239,10 +259,10 @@ pub mod tenis_actions {
             if play.oponent == 41 {
                 return updated_game.game_win(Player::Oponent);
             }
-            return Game {
+             Game {
                 score: play,
                 ..self
-            };
+            }
         }
 
         fn deuce_point(self, who_scored: Player) -> Game {
@@ -263,7 +283,7 @@ pub mod tenis_actions {
                 return updated_game.game_win(Player::Oponent);
             }
 
-            return updated_game;
+            updated_game
         }
 
         /// Adds point in the tie break
@@ -283,7 +303,7 @@ pub mod tenis_actions {
             if difference == -2 && updated_game.score.oponent >= 6 {
                 return updated_game.game_win(Player::Oponent);
             }
-            return updated_game;
+             updated_game
         }
 
         /// adds game point if the game was won
@@ -297,10 +317,10 @@ pub mod tenis_actions {
                 Player::Home => self.sets.map(|set: Sets| {
                     if !set.finished && !done {
                         done = true;
-                        return Sets {
+                         Sets {
                             home: set.home + 1,
                             ..set
-                        };
+                        }
                     } else {
                         set
                     }
@@ -310,12 +330,12 @@ pub mod tenis_actions {
                 Player::Oponent => self.sets.map(|set: Sets| {
                     if !set.finished && !done {
                         done = true;
-                        return Sets {
+                         Sets {
                             oponent: set.oponent + 1,
                             ..set
-                        };
+                        }
                     } else {
-                        return set;
+                         set
                     }
                 }),
             };
@@ -361,7 +381,7 @@ pub mod tenis_actions {
                         ..set
                     };
                 }
-                return set;
+                 set
             });
 
             let mut activate_tie_break: bool = false;
@@ -370,9 +390,9 @@ pub mod tenis_actions {
             score = score.map(|set: Sets| {
                 if set.home == 6 && set.oponent == 6 && self.stage != Stage::TieBreak {
                     activate_tie_break = true;
-                    return set;
+                     set
                 } else {
-                    return set;
+                     set
                 }
             });
 
@@ -384,11 +404,11 @@ pub mod tenis_actions {
                 };
             }
 
-            return Game {
+           Game {
                 score: Score::new(),
                 stage: Stage::Normal,
                 sets: score,
-            };
+            }
         }
     }
 }

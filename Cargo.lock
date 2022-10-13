@@ -5,3 +5,7 @@ version = 3
 [[package]]
 name = "rust-lib"
 version = "0.1.0"
+
+[[package]]
+name = "wasm-lib"
+version = "0.1.0"
