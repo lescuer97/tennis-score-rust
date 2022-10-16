@@ -1,0 +1,39 @@
+
+name: test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Release test
+      run: cargo test --release --verbose
+    - name: Test 
+      run: cargo test --verbose
+    - name: WASM pack test 
+      working-directory: ./wasm_tennis
+      run: | 
+        curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+        wasm-pack test --node
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Release Build
+      run: cargo build --release --verbose
+    - name: Build
+      run: cargo build --verbose
+    - name: Wasm build
+      run: |
+        rustup target add wasm32-unknown-unknown
+        cargo install -f wasm-bindgen-cli
+        cargo build --target wasm32-unknown-unknown && mkdir pkg/ -p &&  wasm-bindgen --out-dir pkg/  --target deno ./target/wasm32-unknown-unknown/debug/wasm_tennis.wasm 

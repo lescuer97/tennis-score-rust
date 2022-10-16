@@ -2,5 +2,5 @@
 
 members = [
     "rust-lib",
-    "wasm-lib"
+    "wasm_tennis"
 ]
