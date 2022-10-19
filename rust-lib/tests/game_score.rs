@@ -4,7 +4,7 @@
 // mod tests {
 //     use super::*;
 // mod tenis_actions;
-use rust_lib::tenis_actions::{Game, Player, Score, Sets, Stage};
+use tennis_lib::{Game, Player, Score, Sets, Stage};
 
 #[test]
 fn initialize() {
