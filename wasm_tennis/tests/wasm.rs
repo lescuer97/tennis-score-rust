@@ -1,10 +1,10 @@
 use wasm_bindgen_test::*;
-use wasm_bindgen::JsValue;
-use wasm_tennis::create_game;
-use tennis_lib::FullGame;
+// use wasm_bindgen::JsValue;
+// use wasm_tennis::create_game;
+// use tennis_lib::FullGame;
 #[wasm_bindgen_test]
 fn pass() {
-    let num: u8 = 0 +1;
+    let num: u8 = 0 + 1;
     assert_eq!(1, num);
 }
 
@@ -16,4 +16,3 @@ fn pass() {
 //     };
 //     assert_eq!(1, 2);
 // }
-

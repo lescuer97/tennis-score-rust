@@ -1,6 +1,6 @@
 //! `tennis-score` is a little "in development" app that lets you play tennis and in the future
 //! be able to be put in a micro controller so you can carry it to play games.
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Denotes in what stage of a set you are.
 #[derive(PartialEq, Eq, Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Stage {
@@ -16,15 +16,12 @@ pub struct FullGame {
     pub list_history: Vec<Game>,
 }
 impl Default for FullGame {
-    fn default()-> Self {
+    fn default() -> Self {
         let vector: Vec<Game> = Vec::new();
-        FullGame {                    
-
-
+        FullGame {
             game_score: Game::new(),
-            list_history: vector,                                       
+            list_history: vector,
         }
-
     }
 }
 impl FullGame {
@@ -83,7 +80,6 @@ impl FullGame {
                 game_score: value_to_set,
                 list_history: list_array,
             }
-
         } else {
             self.to_owned()
         }
@@ -98,30 +94,27 @@ pub struct Sets {
 }
 impl Sets {
     pub fn new() -> Self {
-        Sets { home: 0,
-        oponent: 0,
-        finished: false,
+        Sets {
+            home: 0,
+            oponent: 0,
+            finished: false,
         }
     }
 
     pub fn add_point(self, who_scored: Player) -> Sets {
         match who_scored {
-            Player::Home => {
-                Sets {
-                    home: self.home + 1,
-                    ..self
-                }
-            }
-            Player::Oponent => {
-                Sets {
-                    oponent: self.oponent + 1,
-                    ..self
-                }
-            }
+            Player::Home => Sets {
+                home: self.home + 1,
+                ..self
+            },
+            Player::Oponent => Sets {
+                oponent: self.oponent + 1,
+                ..self
+            },
         }
     }
 }
-#[derive(PartialEq, Debug,Eq , Default, Clone, Copy, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Eq, Default, Clone, Copy, Serialize, Deserialize)]
 /// Current score for the game
 pub struct Score {
     pub home: i8,
@@ -151,34 +144,26 @@ impl Score {
             _ => score_to_change,
         };
         match who_scored {
-            Player::Home => {
-                Score {
-                    home: new_score,
-                    ..self
-                }
-            }
-            Player::Oponent => {
-                Score {
-                    oponent: new_score,
-                    ..self
-                }
-            }
+            Player::Home => Score {
+                home: new_score,
+                ..self
+            },
+            Player::Oponent => Score {
+                oponent: new_score,
+                ..self
+            },
         }
     }
     pub fn deuce_tiebreak_point(self, who_scored: Player) -> Score {
         match who_scored {
-            Player::Home => {
-                Score {
-                    home: self.home + 1,
-                    ..self
-                }
-            }
-            Player::Oponent => {
-                Score {
-                    oponent: self.oponent + 1,
-                    ..self
-                }
-            }
+            Player::Home => Score {
+                home: self.home + 1,
+                ..self
+            },
+            Player::Oponent => Score {
+                oponent: self.oponent + 1,
+                ..self
+            },
         }
     }
 
@@ -188,7 +173,7 @@ impl Score {
 }
 
 /// Structures the game for the scores and the set
-#[derive(PartialEq, Eq,Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Game {
     // First Tupple is Home
     pub score: Score,
@@ -198,20 +183,19 @@ pub struct Game {
     pub sets: [Sets; 3],
 }
 /// Denotes the type of player
-#[derive(PartialEq, Eq,Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Player {
     Home,
     Oponent,
 }
 impl Default for Game {
     fn default() -> Self {
-    Game {
-        score: Score::new(),
-        stage: Stage::Normal,
-        sets: [Sets::new(); 3],
+        Game {
+            score: Score::new(),
+            stage: Stage::Normal,
+            sets: [Sets::new(); 3],
+        }
     }
-
-    }    
 }
 impl Game {
     /// creates a new initial game.
@@ -229,7 +213,6 @@ impl Game {
             Stage::Deuce => self.deuce_point(point),
             Stage::TieBreak => self.tie_break_point(point),
         }
-
     }
     /// Adds point a Normal Stage Game, depending on the score.
     fn normal_point(self, who_scored: Player) -> Game {
@@ -337,74 +320,67 @@ impl Game {
             }),
         };
 
-            // THIS CHECKS IF SET WAS WON
-            score = score.map(|set: Sets| {
-                let difference: i8 = set.home - set.oponent;
-                // FOR Home SET WIN
-                // this checks tiebreak win
-                if difference == 1
-                    && set.oponent == 6
-                        && !set.finished
-                        && self.stage == Stage::TieBreak
-                        {
-                            return Sets {
-                                finished: true,
-                                ..set
-                            };
-                        }
-                // checks normal set win
-                if difference == 2 && set.oponent >= 4 && !set.finished {
-                    return Sets {
-                        finished: true,
-                        ..set
-                    };
-                }
-                // FOR OPPOSITION SET WIN
-                // this check tiebreak win
-                if difference == -1
-                    && set.home == 6
-                        && !set.finished
-                        && self.stage == Stage::TieBreak
-                        {
-                            return Sets {
-                                finished: true,
-                                ..set
-                            };
-                        }
-                // checks normal set win
-                if difference == -2 && set.home >= 4 && !set.finished {
-                    return Sets {
-                        finished: true,
-                        ..set
-                    };
-                }
-                set
-            });
-
-            let mut activate_tie_break: bool = false;
-
-            // THIS CHECKS IF there is a tieBreak and sets the tie_break up if 6 - 6 and not already on tiebreak
-            score = score.map(|set: Sets| {
-                if set.home == 6 && set.oponent == 6 && self.stage != Stage::TieBreak {
-                    activate_tie_break = true;
-                    set
-                } else {
-                    set
-                }
-            });
-
-            if activate_tie_break {
-                return Game {
-                    score: Score::new(),
-                    stage: Stage::TieBreak,
-                    sets: score,
+        // THIS CHECKS IF SET WAS WON
+        score = score.map(|set: Sets| {
+            let difference: i8 = set.home - set.oponent;
+            // FOR Home SET WIN
+            // this checks tiebreak win
+            if difference == 1 && set.oponent == 6 && !set.finished && self.stage == Stage::TieBreak
+            {
+                return Sets {
+                    finished: true,
+                    ..set
                 };
             }
-
-            Game {
-                score: Score::new(),
-                stage: Stage::Normal,
-                sets: score,
+            // checks normal set win
+            if difference == 2 && set.oponent >= 4 && !set.finished {
+                return Sets {
+                    finished: true,
+                    ..set
+                };
             }
+            // FOR OPPOSITION SET WIN
+            // this check tiebreak win
+            if difference == -1 && set.home == 6 && !set.finished && self.stage == Stage::TieBreak {
+                return Sets {
+                    finished: true,
+                    ..set
+                };
+            }
+            // checks normal set win
+            if difference == -2 && set.home >= 4 && !set.finished {
+                return Sets {
+                    finished: true,
+                    ..set
+                };
+            }
+            set
+        });
+
+        let mut activate_tie_break: bool = false;
+
+        // THIS CHECKS IF there is a tieBreak and sets the tie_break up if 6 - 6 and not already on tiebreak
+        score = score.map(|set: Sets| {
+            if set.home == 6 && set.oponent == 6 && self.stage != Stage::TieBreak {
+                activate_tie_break = true;
+                set
+            } else {
+                set
+            }
+        });
+
+        if activate_tie_break {
+            return Game {
+                score: Score::new(),
+                stage: Stage::TieBreak,
+                sets: score,
+            };
+        }
+
+        Game {
+            score: Score::new(),
+            stage: Stage::Normal,
+            sets: score,
+        }
     }
 }
