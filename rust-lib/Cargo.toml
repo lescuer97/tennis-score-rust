@@ -13,3 +13,4 @@ path = "src/lib.rs"
 
 [dependencies]
 serde = { version = "1.0.145", features = ["derive"] }
+wasm-bindgen = { version = "0.2.83", features = ["serde", "serde_json"] }

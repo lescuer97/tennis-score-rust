@@ -1,8 +1,11 @@
 //! `tennis-score` is a little "in development" app that lets you play tennis and in the future
 //! be able to be put in a micro controller so you can carry it to play games.
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::*;
+
 /// Denotes in what stage of a set you are.
 #[derive(PartialEq, Eq, Debug, Clone, Copy, Serialize, Deserialize)]
+#[wasm_bindgen]
 pub enum Stage {
     Normal,
     Deuce,
@@ -86,7 +89,7 @@ impl FullGame {
     }
 }
 #[derive(PartialEq, Eq, Debug, Clone, Copy, Default, Serialize, Deserialize)]
-
+#[wasm_bindgen]
 pub struct Sets {
     pub home: i8,
     pub oponent: i8,
@@ -115,6 +118,7 @@ impl Sets {
     }
 }
 #[derive(PartialEq, Debug, Eq, Default, Clone, Copy, Serialize, Deserialize)]
+#[wasm_bindgen]
 /// Current score for the game
 pub struct Score {
     pub home: i8,
@@ -184,6 +188,7 @@ pub struct Game {
 }
 /// Denotes the type of player
 #[derive(PartialEq, Eq, Debug, Clone, Copy, Serialize, Deserialize)]
+#[wasm_bindgen]
 pub enum Player {
     Home,
     Oponent,

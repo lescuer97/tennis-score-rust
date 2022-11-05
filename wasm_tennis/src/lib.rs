@@ -1,6 +1,6 @@
 use serde::{de::DeserializeOwned,  Serialize};
 // cargo build --target wasm32-unknown-unknown && mkdir pkg/ -p &&  wasm-bindgen --out-dir pkg/  --target deno ./target/wasm32-unknown-unknown/debug/wasm_tennis.wasm
-// mkdir pkg/
+// mkdir -p pkg/
 // wasm-bindgen --out-dir pkg/  --target deno --typescript ./target/wasm32-unknown-unknown/debug/wasm_tennis.wasm
 use wasm_bindgen::prelude::*;
 use tennis_lib::{FullGame, Player};
