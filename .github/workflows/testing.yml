@@ -22,10 +22,10 @@ jobs:
       run: | 
         curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
         wasm-pack test --node
-    - name: wasm testing 
-      uses: denoland/setup-deno@v1
+    - uses: denoland/setup-deno@v1
       with:
         deno-version: v1.x
+    - name: wasm testing 
       run: |
         rustup target add wasm32-unknown-unknown
         cargo install -f wasm-bindgen-cli
