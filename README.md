@@ -22,3 +22,9 @@ you can use the default test and build cargo commands
 ```
 cargo build --target wasm32-unknown-unknown && mkdir pkg/ -p &&  wasm-bindgen --out-dir pkg/  --target deno ./target/wasm32-unknown-unknown/debug/wasm_tennis.wasm
 ```
+
+#### run deno server
+```
+cd web-front/
+deno run  --allow-env --allow-net --allow-read --allow-run index.ts
+```
