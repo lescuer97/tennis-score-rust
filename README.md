@@ -15,3 +15,10 @@ you can use the default test and build cargo commands
 4. Display Scores
 5. Transfer app to embedded
 6. Start testing in embedded. 
+
+### Development
+
+#### build tennis library
+```
+cargo build --target wasm32-unknown-unknown && mkdir pkg/ -p &&  wasm-bindgen --out-dir pkg/  --target deno ./target/wasm32-unknown-unknown/debug/wasm_tennis.wasm
+```
